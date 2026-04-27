@@ -70,11 +70,47 @@ export class StudentService {
       const stored = localStorage.getItem(this.STORAGE_KEY);
       if (stored) {
         const parsedStudents = JSON.parse(stored);
+        // Ensure demo student is always present
+        const hasDemoStudent = parsedStudents.some((s: Student) => s.id === 'demo_student_001');
+        if (!hasDemoStudent) {
+          parsedStudents.unshift(this.demoStudent());
+          localStorage.setItem(this.STORAGE_KEY, JSON.stringify(parsedStudents));
+        }
         this.students.next(parsedStudents);
+      } else {
+        const seed = [this.demoStudent()];
+        this.students.next(seed);
+        localStorage.setItem(this.STORAGE_KEY, JSON.stringify(seed));
       }
     } catch (error) {
       console.error('Failed to load students from storage:', error);
     }
+  }
+
+  private demoStudent(): Student {
+    return {
+      id: 'demo_student_001',
+      firstName: 'Aanya',
+      lastName: 'Sharma',
+      email: 'aanya.sharma@university.edu',
+      phone: '9876543210',
+      rollNumber: 'STU001',
+      gender: 'female',
+      department: 'Computer Science',
+      currentSemester: '4th Semester',
+      checkInDate: '2025-08-01',
+      residenceExpiry: '2026-07-31',
+      roomNumber: 'B-204',
+      selectedRoom: 'Double Sharing',
+      roomPrice: 5500,
+      maintenanceCharge: 500,
+      securityDeposit: 2000,
+      messFee: 3200,
+      totalPayment: 11200,
+      residencyAccount: 'university',
+      status: 'active',
+      createdAt: '2025-08-01T09:00:00.000Z'
+    };
   }
 
   private saveToStorage(students: Student[]): void {
