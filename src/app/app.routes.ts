@@ -1,7 +1,10 @@
 import { Routes } from '@angular/router';
 
 export const routes: Routes = [
-  { path: '', redirectTo: 'admin/dashboard', pathMatch: 'full' },
+  {
+    path: '',
+    loadComponent: () => import('./home/home.component').then(m => m.HomeComponent)
+  },
   {
     path: 'admin',
     loadComponent: () => import('./admin/admin-shell/admin-shell.component').then(m => m.AdminShellComponent),
