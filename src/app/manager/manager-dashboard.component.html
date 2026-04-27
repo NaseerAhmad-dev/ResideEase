@@ -1,0 +1,227 @@
+<div class="manager-page">
+  <div class="manager-head">
+    <div>
+      <p class="manager-eyebrow">Manager console</p>
+      <h1>Welcome back, {{ managerName }}</h1>
+      <p class="manager-sub">Your manager dashboard for {{ hostelName }} — monitor residents, requests, and facility status.</p>
+    </div>
+    <a routerLink="/admin/dashboard" class="btn-outline">Go to admin</a>
+    <button type="button" class="btn-primary" (click)="signOut()">Sign out</button>
+  </div>
+
+  <div class="manager-stats">
+    <div *ngFor="let stat of stats" class="stat-card" [ngClass]="'stat-card--' + stat.accent">
+      <div class="stat-label">{{ stat.title }}</div>
+      <div class="stat-value">{{ stat.value }}</div>
+      <div class="stat-subtitle">{{ stat.subtitle }}</div>
+    </div>
+  </div>
+
+  <div class="manager-grid">
+    <section class="panel panel--wide">
+      <div class="panel-head">
+        <div>
+          <p class="panel-eyebrow">Daily overview</p>
+          <h2>How things are looking today</h2>
+        </div>
+        <span class="badge badge--brand">Live updates</span>
+      </div>
+      <div class="overview-cards">
+        <article class="overview-card">
+          <p class="overview-card-label">New maintenance tickets</p>
+          <h3>4</h3>
+          <p class="overview-card-note">2 high priority · 2 low priority</p>
+        </article>
+        <article class="overview-card">
+          <p class="overview-card-label">Resident check-ins</p>
+          <h3>8</h3>
+          <p class="overview-card-note">Today’s scheduled arrivals</p>
+        </article>
+        <article class="overview-card">
+          <p class="overview-card-label">Upcoming inspections</p>
+          <h3>3</h3>
+          <p class="overview-card-note">Rooms due for review</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- Mess Management Section -->
+    <section class="panel panel--wide">
+      <div class="panel-head">
+        <div>
+          <p class="panel-eyebrow">Mess management</p>
+          <h2>Today's meal service overview</h2>
+        </div>
+        <span class="badge badge--green">Live updates</span>
+      </div>
+      <div class="mess-stats-grid">
+        <div class="mess-stat-card mess-stat-card--brand">
+          <div class="mess-stat-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <path d="M3 7h18l-1 10H4L3 7z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M8 7V3a1 1 0 011-1h6a1 1 0 011 1v4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="mess-stat-content">
+            <div class="mess-stat-value">{{ messStats.totalSubscribed }}</div>
+            <div class="mess-stat-label">Students subscribed</div>
+            <div class="mess-stat-sub">For today's meals</div>
+          </div>
+        </div>
+        <div class="mess-stat-card mess-stat-card--green">
+          <div class="mess-stat-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+              <path d="M8 12l2 2 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="mess-stat-content">
+            <div class="mess-stat-value">{{ messStats.totalServed }}</div>
+            <div class="mess-stat-label">Meals served</div>
+            <div class="mess-stat-sub">Students who ate</div>
+          </div>
+        </div>
+        <div class="mess-stat-card mess-stat-card--amber">
+          <div class="mess-stat-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+              <path d="M12 8v4M12 16v.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="mess-stat-content">
+            <div class="mess-stat-value">{{ messStats.pendingStudents }}</div>
+            <div class="mess-stat-label">Pending students</div>
+            <div class="mess-stat-sub">Awaiting service</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Coupon Validation Section -->
+    <section class="panel">
+      <div class="panel-head">
+        <div>
+          <p class="panel-eyebrow">Coupon validation</p>
+          <h2>Validate meal coupons</h2>
+        </div>
+      </div>
+      <div class="coupon-validation">
+        <div class="coupon-input-group">
+          <input
+            type="text"
+            [(ngModel)]="couponInput"
+            placeholder="Enter coupon number"
+            class="coupon-input"
+            (keyup.enter)="validateCoupon()"
+          >
+          <button type="button" class="btn-primary" (click)="validateCoupon()">Validate</button>
+        </div>
+        <div class="validation-message" *ngIf="validationMessage" [class.success]="validationMessage.includes('✅')" [class.error]="validationMessage.includes('❌')">
+          {{ validationMessage }}
+        </div>
+      </div>
+    </section>
+
+    <!-- Today's Enrollments Section -->
+    <section class="panel">
+      <div class="panel-head">
+        <div>
+          <p class="panel-eyebrow">Today's enrollments</p>
+          <h2>Students enrolled for lunch</h2>
+        </div>
+        <span class="badge badge--sky">{{ pendingEnrollments.length }} pending</span>
+      </div>
+      <div class="enrollment-list">
+        <div *ngFor="let enrollment of pendingEnrollments" class="enrollment-item">
+          <div class="enrollment-info">
+            <div class="enrollment-name">{{ enrollment.studentName }}</div>
+            <div class="enrollment-details">{{ enrollment.rollNumber }} · Coupon: {{ enrollment.couponNumber }}</div>
+          </div>
+          <span class="enrollment-status" [class]="'enrollment-status--' + enrollment.status">
+            {{ enrollment.status === 'enrolled' ? 'Ready' : enrollment.status }}
+          </span>
+        </div>
+        <div *ngIf="pendingEnrollments.length === 0" class="empty-state">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" opacity="0.3"/>
+            <path d="M8 12l2 2 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <p>No pending enrollments for lunch</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Notifications Section -->
+    <section class="panel">
+      <div class="panel-head">
+        <div>
+          <p class="panel-eyebrow">Notifications</p>
+          <h2>Recent updates</h2>
+        </div>
+        <div class="notification-actions">
+          <button type="button" class="btn-ghost" (click)="addTimingNotification('lunch')">Add lunch timing</button>
+          <button type="button" class="btn-ghost" (click)="addTimingNotification('dinner')">Add dinner timing</button>
+          <button type="button" class="btn-ghost" (click)="addAnnouncement()">Add notice</button>
+        </div>
+      </div>
+      <div class="notification-list">
+        <div *ngFor="let notification of notifications" class="notification-item" [class.unread]="!notification.isRead">
+          <div class="notification-content">
+            <div class="notification-title">{{ notification.title }}</div>
+            <div class="notification-message">{{ notification.message }}</div>
+            <div class="notification-time">{{ notification.createdAt | date:'short' }}</div>
+          </div>
+          <div class="notification-actions">
+            <span class="notification-priority" [class]="'priority--' + notification.priority">
+              {{ notification.priority }}
+            </span>
+            <button *ngIf="!notification.isRead" type="button" class="btn-ghost" (click)="markNotificationAsRead(notification.id)">Mark read</button>
+          </div>
+        </div>
+        <div *ngIf="notifications.length === 0" class="empty-state">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
+            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="currentColor" stroke-width="2" opacity="0.3"/>
+            <path d="M14 2v6h6M16 13H8M16 17H8M10 9H8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <p>No notifications yet</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <div>
+          <p class="panel-eyebrow">Quick actions</p>
+          <h2>Manager tasks</h2>
+        </div>
+      </div>
+      <div class="action-grid">
+        <button *ngFor="let action of quickActions" class="action-card">
+          <div class="action-icon">•</div>
+          <div>
+            <p class="action-title">{{ action.title }}</p>
+            <p class="action-sub">{{ action.subtitle }}</p>
+          </div>
+        </button>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <div>
+          <p class="panel-eyebrow">Tasks</p>
+          <h2>Today’s to-do list</h2>
+        </div>
+      </div>
+      <div class="task-list">
+        <article *ngFor="let task of todayTasks" class="task-item">
+          <div>
+            <p class="task-title">{{ task.title }}</p>
+            <p class="task-status">{{ task.status }}</p>
+          </div>
+          <span class="task-dot"></span>
+        </article>
+      </div>
+    </section>
+  </div>
+</div>

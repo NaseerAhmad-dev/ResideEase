@@ -1,0 +1,259 @@
+<div class="settings-container">
+  <div class="settings-header">
+    <div>
+      <h1 class="settings-title">Settings</h1>
+      <p class="settings-subtitle">Manage settings for your hostel</p>
+    </div>
+    <button
+      class="save-btn"
+      (click)="saveSettings()"
+      [disabled]="!hasChanges"
+      [class.save-btn--enabled]="hasChanges">
+      <span class="save-icon">💾</span>
+      Save Changes
+    </button>
+  </div>
+
+  <div class="settings-content">
+    <div class="settings-tabs">
+      <button
+        class="tab-btn"
+        [class.active]="activeTab === 'hostel'"
+        (click)="activeTab = 'hostel'">
+        🏢 Hostel Info
+      </button>
+      <button
+        class="tab-btn"
+        [class.active]="activeTab === 'rooms'"
+        (click)="activeTab = 'rooms'">
+        🛏️ Rooms
+      </button>
+      <button
+        class="tab-btn"
+        [class.active]="activeTab === 'mess'"
+        (click)="activeTab = 'mess'">
+        🍽️ Mess
+      </button>
+      <button
+        class="tab-btn"
+        [class.active]="activeTab === 'system'"
+        (click)="activeTab = 'system'">
+        ⚙️ System
+      </button>
+    </div>
+
+    <div class="tab-content">
+      <!-- Hostel Information Tab -->
+      <div *ngIf="activeTab === 'hostel'" class="settings-section">
+        <h3 class="section-title">Hostel Information</h3>
+        <form class="settings-form">
+          <div class="form-group">
+            <label class="form-label">Hostel Name</label>
+            <input
+              type="text"
+              class="form-input"
+              [(ngModel)]="settings.hostel.name"
+              (ngModelChange)="markAsChanged()"
+              placeholder="Enter hostel name">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Address</label>
+            <textarea
+              class="form-textarea"
+              [(ngModel)]="settings.hostel.address"
+              (ngModelChange)="markAsChanged()"
+              placeholder="Enter full address"
+              rows="3"></textarea>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Phone</label>
+              <input
+                type="tel"
+                class="form-input"
+                [(ngModel)]="settings.hostel.phone"
+                (ngModelChange)="markAsChanged()"
+                placeholder="+91 XXXXX XXXXX">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Email</label>
+              <input
+                type="email"
+                class="form-input"
+                [(ngModel)]="settings.hostel.email"
+                (ngModelChange)="markAsChanged()"
+                placeholder="admin@hostel.com">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Website</label>
+            <input
+              type="url"
+              class="form-input"
+              [(ngModel)]="settings.hostel.website"
+              (ngModelChange)="markAsChanged()"
+              placeholder="https://yourhostel.com">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Description</label>
+            <textarea
+              class="form-textarea"
+              [(ngModel)]="settings.hostel.description"
+              (ngModelChange)="markAsChanged()"
+              placeholder="Brief description of your hostel"
+              rows="3"></textarea>
+          </div>
+        </form>
+      </div>
+
+      <!-- Rooms Tab -->
+      <div *ngIf="activeTab === 'rooms'" class="settings-section">
+        <h3 class="section-title">Room Pricing</h3>
+        <div class="pricing-grid">
+          <div *ngFor="let room of settings.rooms" class="pricing-card">
+            <div class="pricing-header">
+              <h4 class="pricing-title">{{ room.label }}</h4>
+              <label class="toggle">
+                <input
+                  type="checkbox"
+                  [(ngModel)]="room.enabled"
+                  (ngModelChange)="markAsChanged()">
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+            <div class="pricing-input">
+              <span class="currency">₹</span>
+              <input
+                type="number"
+                class="price-input"
+                [(ngModel)]="room.price"
+                (ngModelChange)="markAsChanged()"
+                [disabled]="!room.enabled"
+                min="0">
+              <span class="period">/month</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mess Tab -->
+      <div *ngIf="activeTab === 'mess'" class="settings-section">
+        <h3 class="section-title">Mess Plans</h3>
+        <div class="pricing-grid">
+          <div *ngFor="let meal of settings.meals" class="pricing-card">
+            <div class="pricing-header">
+              <h4 class="pricing-title">{{ meal.label }}</h4>
+              <label class="toggle">
+                <input
+                  type="checkbox"
+                  [(ngModel)]="meal.enabled"
+                  (ngModelChange)="markAsChanged()">
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+            <div class="pricing-input">
+              <span class="currency">₹</span>
+              <input
+                type="number"
+                class="price-input"
+                [(ngModel)]="meal.price"
+                (ngModelChange)="markAsChanged()"
+                [disabled]="!meal.enabled"
+                min="0">
+              <span class="period">/month</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-section" style="margin-top: 32px;">
+          <h3 class="section-title">Dietary Options</h3>
+          <div class="dietary-options">
+            <div *ngFor="let option of settings.dietaryOptions; let i = index" class="dietary-item">
+              <input
+                type="text"
+                class="form-input dietary-input"
+                [(ngModel)]="settings.dietaryOptions[i]"
+                (ngModelChange)="markAsChanged()"
+                placeholder="Dietary preference">
+              <button
+                class="remove-btn"
+                (click)="removeDietaryOption(i)"
+                title="Remove option">
+                ×
+              </button>
+            </div>
+            <button class="add-btn" (click)="addDietaryOption()">
+              + Add Dietary Option
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- System Tab -->
+      <div *ngIf="activeTab === 'system'" class="settings-section">
+        <h3 class="section-title">System Settings</h3>
+        <div class="system-settings">
+          <div class="setting-item">
+            <div class="setting-info">
+              <h4 class="setting-title">Online Booking</h4>
+              <p class="setting-desc">Allow students to book rooms online</p>
+            </div>
+            <label class="toggle">
+              <input
+                type="checkbox"
+                [(ngModel)]="settings.system.allowOnlineBooking"
+                (ngModelChange)="markAsChanged()">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+
+          <div class="setting-item">
+            <div class="setting-info">
+              <h4 class="setting-title">Require Approval</h4>
+              <p class="setting-desc">Require admin approval for new bookings</p>
+            </div>
+            <label class="toggle">
+              <input
+                type="checkbox"
+                [(ngModel)]="settings.system.requireApproval"
+                (ngModelChange)="markAsChanged()">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+
+          <div class="setting-item">
+            <div class="setting-info">
+              <h4 class="setting-title">Maintenance Mode</h4>
+              <p class="setting-desc">Put the system in maintenance mode</p>
+            </div>
+            <label class="toggle">
+              <input
+                type="checkbox"
+                [(ngModel)]="settings.system.maintenanceMode"
+                (ngModelChange)="markAsChanged()">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+
+          <div class="setting-item">
+            <div class="setting-info">
+              <h4 class="setting-title">Email Notifications</h4>
+              <p class="setting-desc">Send email notifications for bookings</p>
+            </div>
+            <label class="toggle">
+              <input
+                type="checkbox"
+                [(ngModel)]="settings.system.notificationsEnabled"
+                (ngModelChange)="markAsChanged()">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,340 @@
+<div class="sp-page">
+  <div *ngIf="student; else missingStudent">
+
+    <!-- Page header -->
+    <div class="sp-header">
+      <div class="sp-header-left">
+        <div class="sp-avatar">{{ student.firstName[0] }}{{ student.lastName[0] }}</div>
+        <div>
+          <p class="sp-eyebrow">Student dashboard</p>
+          <h1 class="sp-title">{{ student.firstName }} {{ student.lastName }}</h1>
+          <p class="sp-sub">{{ student.rollNumber }} · {{ student.department || 'N/A' }}</p>
+        </div>
+      </div>
+      <div class="sp-header-right">
+        <span class="badge" [ngClass]="feeStatusBadgeClass">{{ feeStatusLabel }}</span>
+        <button type="button" class="btn-primary" (click)="signOut()">Sign out</button>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="sp-tabs" role="tablist">
+      <button role="tab" [class.active]="activeTab === 'basic'" (click)="activeTab = 'basic'" [attr.aria-selected]="activeTab === 'basic'">
+        <svg width="14" height="14" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+          <path d="M10 10a4 4 0 100-8 4 4 0 000 8zm-7 8a7 7 0 0114 0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        Basic details
+      </button>
+      <button role="tab" [class.active]="activeTab === 'education'" (click)="activeTab = 'education'" [attr.aria-selected]="activeTab === 'education'">
+        <svg width="14" height="14" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+          <path d="M10 2L2 7l8 5 8-5-8-5zM2 13l8 5 8-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Educational details
+      </button>
+      <button role="tab" [class.active]="activeTab === 'hostel'" (click)="activeTab = 'hostel'" [attr.aria-selected]="activeTab === 'hostel'">
+        <svg width="14" height="14" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+          <path d="M3 18V9l7-5 7 5v9M8 18v-6h4v6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Hostel details
+      </button>
+      <button role="tab" [class.active]="activeTab === 'fees'" (click)="activeTab = 'fees'" [attr.aria-selected]="activeTab === 'fees'">
+        <svg width="14" height="14" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+          <rect x="2" y="5" width="16" height="12" rx="2" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M2 9h16M6 13h2M10 13h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        Fee details
+      </button>
+      <button role="tab" [class.active]="activeTab === 'mess'" (click)="activeTab = 'mess'" [attr.aria-selected]="activeTab === 'mess'">
+        <svg width="14" height="14" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+          <path d="M3 7h14l-1 10H4L3 7z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M8 7V3a1 1 0 011-1h2a1 1 0 011 1v4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Mess enrollment
+      </button>
+    </div>
+
+    <!-- Basic tab -->
+    <div class="sp-panel" *ngIf="activeTab === 'basic'" role="tabpanel">
+      <div class="detail-grid">
+        <div class="detail-item">
+          <span class="detail-label">Full name</span>
+          <span class="detail-value">{{ student.firstName }} {{ student.lastName }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Roll number</span>
+          <span class="detail-value">{{ student.rollNumber }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Email</span>
+          <span class="detail-value">{{ student.email }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Phone</span>
+          <span class="detail-value">{{ student.phone }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Gender</span>
+          <span class="detail-value">{{ student.gender | titlecase }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Account status</span>
+          <span class="detail-value">
+            <span class="badge"
+              [class.badge--green]="student.status === 'active'"
+              [class.badge--amber]="student.status === 'pending'"
+              [class.badge--danger]="student.status === 'inactive'">
+              {{ student.status | titlecase }}
+            </span>
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Education tab -->
+    <div class="sp-panel" *ngIf="activeTab === 'education'" role="tabpanel">
+      <div class="detail-grid">
+        <div class="detail-item">
+          <span class="detail-label">Course / Department</span>
+          <span class="detail-value">{{ student.department || 'N/A' }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Current semester</span>
+          <span class="detail-value">{{ student.currentSemester }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Residency account</span>
+          <span class="detail-value">{{ student.residencyAccount | titlecase }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Member since</span>
+          <span class="detail-value">{{ student.createdAt | date:'mediumDate' }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hostel tab -->
+    <div class="sp-panel" *ngIf="activeTab === 'hostel'" role="tabpanel">
+      <div class="detail-grid">
+        <div class="detail-item">
+          <span class="detail-label">Check-in date</span>
+          <span class="detail-value">{{ student.checkInDate }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Residence expiry</span>
+          <span class="detail-value">{{ student.residenceExpiry }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Room number</span>
+          <span class="detail-value">{{ student.roomNumber || 'N/A' }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Room type</span>
+          <span class="detail-value">{{ student.selectedRoom }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Residency account</span>
+          <span class="detail-value">{{ student.residencyAccount | titlecase }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Residency fee paid</span>
+          <span class="detail-value">{{ residencyFeePaid }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Fee details tab -->
+    <div class="sp-fee-panel" *ngIf="activeTab === 'fees'" role="tabpanel">
+
+      <!-- Status banner -->
+      <div class="fee-banner" [ngClass]="'fee-banner--' + feeStatus">
+        <div class="fee-banner-icon">
+          <svg *ngIf="feeStatus === 'paid'" width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M6.5 10l2.5 2.5 4.5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <svg *ngIf="feeStatus === 'pending'" width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M10 6v4l2 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+          <svg *ngIf="feeStatus === 'overdue'" width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <path d="M10 2L2 17h16L10 2z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+            <path d="M10 8v4M10 14v1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="fee-banner-text">
+          <div class="fee-banner-title">
+            <ng-container *ngIf="feeStatus === 'paid'">All fees cleared</ng-container>
+            <ng-container *ngIf="feeStatus === 'pending'">Payment pending</ng-container>
+            <ng-container *ngIf="feeStatus === 'overdue'">Payment overdue</ng-container>
+          </div>
+          <div class="fee-banner-sub">
+            <ng-container *ngIf="feeStatus === 'paid'">Your account is up to date for this semester.</ng-container>
+            <ng-container *ngIf="feeStatus !== 'paid'">Please clear your dues at the hostel office or online portal.</ng-container>
+          </div>
+        </div>
+        <span class="badge" [ngClass]="feeStatusBadgeClass">{{ feeStatusLabel }}</span>
+      </div>
+
+      <!-- Fee KPI cards -->
+      <div class="fee-kpi-grid">
+        <div class="fee-kpi fee-kpi--brand">
+          <div class="fee-kpi-label">Room fee</div>
+          <div class="fee-kpi-value">₹{{ student.roomPrice | number }}</div>
+          <div class="fee-kpi-sub">per semester</div>
+        </div>
+        <div class="fee-kpi fee-kpi--green">
+          <div class="fee-kpi-label">Mess fee</div>
+          <div class="fee-kpi-value">₹{{ student.messFee | number }}</div>
+          <div class="fee-kpi-sub">per semester</div>
+        </div>
+        <div class="fee-kpi fee-kpi--amber">
+          <div class="fee-kpi-label">Other charges</div>
+          <div class="fee-kpi-value">₹{{ otherCharges | number }}</div>
+          <div class="fee-kpi-sub">maintenance + deposit</div>
+        </div>
+        <div class="fee-kpi fee-kpi--accent">
+          <div class="fee-kpi-label">Total payable</div>
+          <div class="fee-kpi-value">₹{{ student.totalPayment | number }}</div>
+          <div class="fee-kpi-sub">{{ feeStatus === 'paid' ? 'Fully paid' : 'Due amount' }}</div>
+        </div>
+      </div>
+
+      <!-- Fee breakdown panel -->
+      <div class="sp-panel">
+        <div class="panel-head">
+          <div class="panel-title">
+            <svg width="15" height="15" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+              <rect x="2" y="5" width="16" height="12" rx="2" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M2 9h16" stroke="currentColor" stroke-width="1.5"/>
+            </svg>
+            Fee breakdown
+          </div>
+          <span class="stat-tag">{{ student.selectedRoom }}</span>
+        </div>
+
+        <div class="fee-line-list">
+          <div class="fee-line">
+            <div class="fee-line-info">
+              <span class="fee-line-label">Room accommodation</span>
+              <span class="fee-line-desc">{{ student.selectedRoom }}</span>
+            </div>
+            <span class="fee-line-amount">₹{{ student.roomPrice | number }}</span>
+          </div>
+          <div class="fee-line" *ngIf="student.messFee > 0">
+            <div class="fee-line-info">
+              <span class="fee-line-label">Mess / dining</span>
+              <span class="fee-line-desc">Meal plan included</span>
+            </div>
+            <span class="fee-line-amount">₹{{ student.messFee | number }}</span>
+          </div>
+          <div class="fee-line">
+            <div class="fee-line-info">
+              <span class="fee-line-label">Maintenance charge</span>
+              <span class="fee-line-desc">Facility upkeep</span>
+            </div>
+            <span class="fee-line-amount">₹{{ student.maintenanceCharge | number }}</span>
+          </div>
+          <div class="fee-line">
+            <div class="fee-line-info">
+              <span class="fee-line-label">Security deposit</span>
+              <span class="fee-line-desc">Refundable on exit</span>
+            </div>
+            <span class="fee-line-amount">₹{{ student.securityDeposit | number }}</span>
+          </div>
+          <div class="fee-line fee-line--total">
+            <div class="fee-line-info">
+              <span class="fee-line-label">Total payable</span>
+              <span class="fee-line-desc">This semester</span>
+            </div>
+            <span class="fee-line-amount">₹{{ student.totalPayment | number }}</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Mess enrollment tab -->
+    <div class="sp-panel" *ngIf="activeTab === 'mess'" role="tabpanel">
+      <div class="mess-enrollment-section">
+        <div class="mess-header">
+          <h3>Daily Mess Enrollment</h3>
+          <p>Enroll for today's lunch and dinner. One coupon covers both meals.</p>
+        </div>
+
+        <div class="mess-enrollment-card" *ngIf="!todayEnrollment">
+          <div class="enrollment-icon">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
+              <path d="M3 7h18l-1 10H4L3 7z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M8 7V3a1 1 0 011-1h6a1 1 0 011 1v4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="enrollment-content">
+            <h4>Not enrolled for today</h4>
+            <p>Click below to generate your mess coupon for today's meals.</p>
+            <button type="button" class="btn-primary" (click)="enrollForMess()">Enroll for Mess</button>
+          </div>
+        </div>
+
+        <div class="mess-coupon-card" *ngIf="todayEnrollment">
+          <div class="coupon-header">
+            <div class="coupon-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <rect x="2" y="4" width="20" height="16" rx="2" stroke="currentColor" stroke-width="2"/>
+                <path d="M6 8h12M6 12h8M6 16h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <div class="coupon-info">
+              <h4>Mess Coupon Generated</h4>
+              <p class="coupon-date">Valid for {{ todayEnrollment.enrollmentDate | date:'fullDate' }}</p>
+            </div>
+          </div>
+
+          <div class="coupon-number">
+            <span class="coupon-label">Coupon Number</span>
+            <span class="coupon-value">{{ todayEnrollment.couponNumber }}</span>
+          </div>
+
+          <div class="coupon-status">
+            <span class="status-badge" [class]="'status-badge--' + todayEnrollment.status">
+              {{ todayEnrollment.status === 'enrolled' ? 'Active' : todayEnrollment.status === 'served' ? 'Used' : 'Cancelled' }}
+            </span>
+            <span class="status-text">
+              <ng-container *ngIf="todayEnrollment.status === 'enrolled'">Show this coupon to mess staff for meals</ng-container>
+              <ng-container *ngIf="todayEnrollment.status === 'served'">Meals served at {{ todayEnrollment.servedAt | date:'shortTime' }}</ng-container>
+            </span>
+          </div>
+
+          <div class="coupon-note">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+              <path d="M12 8v4M12 16v.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            <span>This coupon is valid for both lunch and dinner today only.</span>
+          </div>
+        </div>
+
+        <div class="success-message" *ngIf="couponGenerated">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+            <path d="M8 12l2 2 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span>Coupon generated successfully!</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <ng-template #missingStudent>
+    <div class="empty-state">
+      <div class="empty-icon">
+        <svg width="28" height="28" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+          <path d="M10 10a4 4 0 100-8 4 4 0 000 8zm-7 8a7 7 0 0114 0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <h2>Profile not found</h2>
+      <p>We could not find a matching student record. Please login again or contact your administrator.</p>
+      <a routerLink="/student/login" class="btn-primary">Return to login</a>
+    </div>
+  </ng-template>
+</div>

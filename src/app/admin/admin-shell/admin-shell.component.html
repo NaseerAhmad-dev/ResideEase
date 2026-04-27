@@ -1,0 +1,115 @@
+<div class="admin-layout" [class.sidebar-collapsed]="!sidebarOpen()">
+
+  <!-- Sidebar -->
+  <aside class="sidebar" role="navigation" aria-label="Admin navigation">
+
+    <!-- Brand -->
+    <div class="sidebar-brand">
+      <div class="brand-logo" aria-label="ResideEase logo">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <rect width="28" height="28" rx="8" fill="#0ab4a8"/>
+          <path d="M14 5L5 11v12h6v-7h6v7h6V11L14 5z" fill="white"/>
+        </svg>
+      </div>
+      <span class="brand-name" *ngIf="sidebarOpen()">ResideEase</span>
+    </div>
+
+    <!-- Primary nav -->
+    <nav class="sidebar-nav">
+      <div class="nav-label" *ngIf="sidebarOpen()">Main menu</div>
+      @for (item of navItems; track item.route) {
+        <a class="nav-item"
+           [routerLink]="item.route"
+           routerLinkActive="active"
+           [attr.title]="!sidebarOpen() ? item.label : null"
+           [attr.aria-label]="item.label">
+          <span class="nav-icon" aria-hidden="true">
+            <ng-container [ngSwitch]="item.icon">
+              <svg *ngSwitchCase="'grid'"   width="18" height="18" viewBox="0 0 20 20" fill="none"><rect x="2" y="2" width="7" height="7" rx="1.5" fill="currentColor"/><rect x="11" y="2" width="7" height="7" rx="1.5" fill="currentColor"/><rect x="2" y="11" width="7" height="7" rx="1.5" fill="currentColor"/><rect x="11" y="11" width="7" height="7" rx="1.5" fill="currentColor"/></svg>
+              <svg *ngSwitchCase="'users'"  width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M9 10a3 3 0 100-6 3 3 0 000 6zm-6 8a6 6 0 0112 0H3zm11-8a3 3 0 10-1.5-5.6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+              <svg *ngSwitchCase="'door'"   width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M3 18V4a1 1 0 011-1h12a1 1 0 011 1v14M1 18h18M8 10h1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+              <svg *ngSwitchCase="'fork'"   width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M6 2v4a2 2 0 002 2h4a2 2 0 002-2V2M10 8v10M6 2v4M14 2v4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+              <svg *ngSwitchCase="'credit'" width="18" height="18" viewBox="0 0 20 20" fill="none"><rect x="2" y="5" width="16" height="12" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M2 9h16" stroke="currentColor" stroke-width="1.5"/></svg>
+              <svg *ngSwitchCase="'bell'"   width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M10 2a6 6 0 00-6 6v3l-2 2v1h16v-1l-2-2V8a6 6 0 00-6-6zm0 16a2 2 0 01-2-2h4a2 2 0 01-2 2z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+              <svg *ngSwitchCase="'gear'"   width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M10 13a3 3 0 100-6 3 3 0 000 6z" stroke="currentColor" stroke-width="1.5"/><path d="M17.7 10.9l-1.4-.8a6 6 0 000-2.2l1.4-.8a1 1 0 00.4-1.3l-1-1.7a1 1 0 00-1.3-.4l-1.4.8a6 6 0 00-1.9-1.1V1.7A1 1 0 0011.5 1h-3a1 1 0 00-1 1v1.4A6 6 0 005.6 4.5l-1.4-.8a1 1 0 00-1.3.4l-1 1.7a1 1 0 00.4 1.3l1.4.8a6 6 0 000 2.2l-1.4.8a1 1 0 00-.4 1.3l1 1.7a1 1 0 001.3.4l1.4-.8a6 6 0 001.9 1.1v1.4a1 1 0 001 1h3a1 1 0 001-1v-1.4a6 6 0 001.9-1.1l1.4.8a1 1 0 001.3-.4l1-1.7a1 1 0 00-.4-1.3z" stroke="currentColor" stroke-width="1.3"/></svg>
+            </ng-container>
+          </span>
+          <span class="nav-label-text" *ngIf="sidebarOpen()">{{ item.label }}</span>
+          @if (item.badge && sidebarOpen()) {
+            <span class="nav-badge">{{ item.badge }}</span>
+          }
+          @if (item.badge && !sidebarOpen()) {
+            <span class="nav-badge-dot"></span>
+          }
+        </a>
+      }
+    </nav>
+
+    <!-- Bottom nav -->
+    <div class="sidebar-bottom">
+      @for (item of bottomNav; track item.route) {
+        <a class="nav-item"
+           [routerLink]="item.route"
+           routerLinkActive="active"
+           [attr.title]="!sidebarOpen() ? item.label : null">
+          <span class="nav-icon" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M10 13a3 3 0 100-6 3 3 0 000 6z" stroke="currentColor" stroke-width="1.5"/><path d="M17.7 10.9l-1.4-.8a6 6 0 000-2.2l1.4-.8a1 1 0 00.4-1.3l-1-1.7a1 1 0 00-1.3-.4l-1.4.8a6 6 0 00-1.9-1.1V1.7A1 1 0 0011.5 1h-3a1 1 0 00-1 1v1.4A6 6 0 005.6 4.5l-1.4-.8a1 1 0 00-1.3.4l-1 1.7a1 1 0 00.4 1.3l1.4.8a6 6 0 000 2.2l-1.4.8a1 1 0 00-.4 1.3l1 1.7a1 1 0 001.3.4l1.4-.8a6 6 0 001.9 1.1v1.4a1 1 0 001 1h3a1 1 0 001-1v-1.4a6 6 0 001.9-1.1l1.4.8a1 1 0 001.3-.4l1-1.7a1 1 0 00-.4-1.3z" stroke="currentColor" stroke-width="1.3"/></svg>
+          </span>
+          <span class="nav-label-text" *ngIf="sidebarOpen()">{{ item.label }}</span>
+        </a>
+      }
+
+      <!-- User avatar -->
+      <div class="nav-user" *ngIf="sidebarOpen()">
+        <div class="user-avatar">W</div>
+        <div class="user-info">
+          <div class="user-name">Warden Admin</div>
+          <div class="user-role">Sunrise Engineering</div>
+        </div>
+      </div>
+      <div class="nav-user-mini" *ngIf="!sidebarOpen()">
+        <div class="user-avatar">W</div>
+      </div>
+    </div>
+
+  </aside>
+
+  <!-- Main area -->
+  <div class="main-area">
+
+    <!-- Topbar -->
+    <header class="topbar" role="banner">
+      <button class="topbar-toggle" (click)="toggleSidebar()"
+              [attr.aria-label]="sidebarOpen() ? 'Collapse sidebar' : 'Expand sidebar'"
+              aria-controls="sidebar">
+        <svg width="18" height="18" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+          <path d="M3 5h14M3 10h14M3 15h14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </button>
+
+      <div class="topbar-search" role="search">
+        <svg width="15" height="15" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+          <circle cx="9" cy="9" r="6" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M16 16l-3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <input type="search" placeholder="Search students, rooms..." aria-label="Search"/>
+      </div>
+
+      <div class="topbar-actions">
+        <button class="icon-btn" aria-label="Notifications">
+          <svg width="18" height="18" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+            <path d="M10 2a6 6 0 00-6 6v3l-2 2v1h16v-1l-2-2V8a6 6 0 00-6-6zm0 16a2 2 0 01-2-2h4a2 2 0 01-2 2z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+          </svg>
+          <span class="notif-dot" aria-label="You have notifications"></span>
+        </button>
+        <div class="topbar-avatar" aria-label="Admin profile">W</div>
+      </div>
+    </header>
+
+    <!-- Page content -->
+    <main class="page-content" id="main-content" tabindex="-1">
+      <router-outlet />
+    </main>
+
+  </div>
+</div>
