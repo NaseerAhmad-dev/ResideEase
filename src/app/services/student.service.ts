@@ -35,7 +35,6 @@ export class StudentService {
     const updatedStudents = [...currentStudents, newStudent];
     this.students.next(updatedStudents);
     this.saveToStorage(updatedStudents);
-
     // Notify mess service about new student
     this.messService.notifyNewStudent(`${newStudent.firstName} ${newStudent.lastName}`);
 
