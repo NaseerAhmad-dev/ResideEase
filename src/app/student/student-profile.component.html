@@ -51,6 +51,14 @@
         </svg>
         Mess enrollment
       </button>
+      <button role="tab" [class.active]="activeTab === 'rebate'" (click)="activeTab = 'rebate'" [attr.aria-selected]="activeTab === 'rebate'">
+        <svg width="14" height="14" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+          <path d="M10 2a8 8 0 100 16A8 8 0 0010 2z" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M7 10h6M10 7v6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        Rebate
+        <span *ngIf="activeRebate" class="tab-indicator" [class.tab-indicator--amber]="activeRebate.status === 'pending'" [class.tab-indicator--green]="activeRebate.status === 'approved'"></span>
+      </button>
     </div>
 
     <!-- Basic tab -->
@@ -261,7 +269,22 @@
           <p>Enroll for today's lunch and dinner. One coupon covers both meals.</p>
         </div>
 
-        <div class="mess-enrollment-card" *ngIf="!todayEnrollment">
+        <!-- Rebate block notice -->
+        <div class="rebate-block-notice" *ngIf="hasApprovedRebate">
+          <div class="rebate-block-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+              <path d="M12 8v4M12 16v.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="rebate-block-content">
+            <strong>Mess enrollment paused</strong>
+            <p>You have an approved rebate of <strong>{{ activeRebate?.days }} days</strong>. Cancel the rebate to generate a mess coupon.</p>
+          </div>
+          <button type="button" class="btn-outline" (click)="activeTab = 'rebate'">View rebate</button>
+        </div>
+
+        <div class="mess-enrollment-card" *ngIf="!todayEnrollment && !hasApprovedRebate">
           <div class="enrollment-icon">
             <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
               <path d="M3 7h18l-1 10H4L3 7z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -320,6 +343,95 @@
           </svg>
           <span>Coupon generated successfully!</span>
         </div>
+      </div>
+    </div>
+
+    <!-- Rebate tab -->
+    <div class="sp-panel" *ngIf="activeTab === 'rebate'" role="tabpanel">
+      <div class="rebate-section">
+
+        <!-- Header -->
+        <div class="rebate-section-head">
+          <h3>Mess Rebate</h3>
+          <p>Request a temporary leave from the mess. During an approved rebate, mess coupon generation is paused.</p>
+        </div>
+
+        <!-- ── No active rebate: show request form ── -->
+        <ng-container *ngIf="!activeRebate">
+          <div class="rebate-options-label">Select rebate duration</div>
+          <div class="rebate-options">
+            <button
+              *ngFor="let d of rebateDayOptions"
+              type="button"
+              class="rebate-option"
+              [class.rebate-option--selected]="selectedRebateDays === d"
+              (click)="selectRebateDays(d)">
+              <span class="rebate-option-days">{{ d }}</span>
+              <span class="rebate-option-label">days</span>
+            </button>
+          </div>
+
+          <div class="rebate-submit-row">
+            <button type="button" class="btn-primary" [disabled]="rebateSubmitting" (click)="submitRebate()">
+              <svg width="15" height="15" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                <path d="M10 2a8 8 0 100 16A8 8 0 0010 2z" stroke="currentColor" stroke-width="1.5"/>
+                <path d="M7 10h6M10 7v6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+              Request {{ selectedRebateDays }}-day rebate
+            </button>
+          </div>
+
+          <div class="rebate-success" *ngIf="rebateSuccessMsg">
+            <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
+              <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M6.5 10l2.5 2.5 4.5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            {{ rebateSuccessMsg }}
+          </div>
+        </ng-container>
+
+        <!-- ── Pending rebate ── -->
+        <ng-container *ngIf="activeRebate?.status === 'pending'">
+          <div class="rebate-status-card rebate-status-card--pending">
+            <div class="rebate-status-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                <path d="M12 8v4l2 2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <div class="rebate-status-info">
+              <div class="rebate-status-title">Rebate request pending</div>
+              <div class="rebate-status-meta">
+                <span class="rebate-days-badge">{{ activeRebate?.days }} days</span>
+                <span>Submitted {{ activeRebate?.requestedAt | date:'mediumDate' }}</span>
+              </div>
+              <p class="rebate-status-desc">Your request is awaiting manager approval. You can still generate mess coupons until it is approved.</p>
+            </div>
+            <button type="button" class="btn-danger-outline" (click)="cancelRebate()">Cancel request</button>
+          </div>
+        </ng-container>
+
+        <!-- ── Approved rebate ── -->
+        <ng-container *ngIf="activeRebate?.status === 'approved'">
+          <div class="rebate-status-card rebate-status-card--approved">
+            <div class="rebate-status-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                <path d="M8 12l2 2 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="rebate-status-info">
+              <div class="rebate-status-title">Rebate approved</div>
+              <div class="rebate-status-meta">
+                <span class="rebate-days-badge rebate-days-badge--green">{{ activeRebate?.days }} days</span>
+                <span>Approved {{ activeRebate?.reviewedAt | date:'mediumDate' }}</span>
+              </div>
+              <p class="rebate-status-desc">Mess enrollment is paused. Cancel this rebate if you want to generate mess coupons again.</p>
+            </div>
+            <button type="button" class="btn-danger-outline" (click)="cancelRebate()">Cancel rebate</button>
+          </div>
+        </ng-container>
+
       </div>
     </div>
 

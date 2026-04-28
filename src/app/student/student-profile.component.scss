@@ -699,3 +699,257 @@
     text-align: center;
   }
 }
+
+/* ─── Tab indicator dot ────────────────── */
+.tab-indicator {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-left: 2px;
+
+  &--amber { background: var(--c-warning); }
+  &--green  { background: var(--c-success); }
+}
+
+/* ─── Rebate block notice (mess tab) ───── */
+.rebate-block-notice {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 18px;
+  border-radius: var(--radius-lg);
+  background: var(--c-warning-bg);
+  border: 1px solid #fde68a;
+  flex-wrap: wrap;
+  margin-bottom: 4px;
+}
+
+.rebate-block-icon {
+  color: #92400e;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+
+.rebate-block-content {
+  flex: 1;
+  min-width: 0;
+
+  strong {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: #92400e;
+    margin-bottom: 2px;
+  }
+
+  p {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin: 0;
+    line-height: 1.4;
+  }
+}
+
+/* ─── Rebate section ───────────────────── */
+.rebate-section {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.rebate-section-head {
+  text-align: center;
+
+  h3 {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 6px;
+  }
+
+  p {
+    font-size: 13.5px;
+    color: var(--text-secondary);
+    margin: 0;
+    line-height: 1.5;
+  }
+}
+
+.rebate-options-label {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text-secondary);
+  margin-bottom: -8px;
+}
+
+.rebate-options {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.rebate-option {
+  flex: 1;
+  min-width: 90px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 20px 16px;
+  border-radius: var(--radius-lg);
+  border: 2px solid var(--border-light);
+  background: var(--bg-page);
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
+
+  &:hover {
+    border-color: var(--brand-mid);
+    background: var(--brand-light);
+  }
+
+  &--selected {
+    border-color: var(--brand);
+    background: var(--brand-light);
+    box-shadow: 0 0 0 3px var(--brand-mid);
+  }
+}
+
+.rebate-option-days {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1;
+}
+
+.rebate-option-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.rebate-submit-row {
+  display: flex;
+  justify-content: center;
+}
+
+.rebate-success {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background: var(--c-success-bg);
+  color: #065f46;
+  border: 1px solid #a7f3d0;
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  font-weight: 500;
+
+  svg { color: #16a34a; flex-shrink: 0; }
+}
+
+/* ─── Rebate status cards ──────────────── */
+.rebate-status-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 20px;
+  border-radius: var(--radius-lg);
+  border: 1px solid;
+  flex-wrap: wrap;
+
+  &--pending {
+    background: var(--c-warning-bg);
+    border-color: #fde68a;
+
+    .rebate-status-icon { color: #92400e; }
+    .rebate-status-title { color: #92400e; }
+  }
+
+  &--approved {
+    background: var(--c-success-bg);
+    border-color: #a7f3d0;
+
+    .rebate-status-icon { color: #065f46; }
+    .rebate-status-title { color: #065f46; }
+  }
+}
+
+.rebate-status-icon {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.rebate-status-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.rebate-status-title {
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.rebate-status-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+}
+
+.rebate-days-badge {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: var(--radius-full);
+  font-size: 12px;
+  font-weight: 700;
+  background: var(--c-warning-bg);
+  color: #92400e;
+  border: 1px solid #fde68a;
+
+  &--green {
+    background: var(--c-success-bg);
+    color: #065f46;
+    border-color: #a7f3d0;
+  }
+}
+
+.rebate-status-desc {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ─── Danger outline button ────────────── */
+.btn-danger-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 9px 18px;
+  border: 1.5px solid #fca5a5;
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  font-weight: 600;
+  color: #dc2626;
+  background: transparent;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  white-space: nowrap;
+
+  &:hover {
+    background: var(--c-danger-bg);
+    border-color: #dc2626;
+  }
+}

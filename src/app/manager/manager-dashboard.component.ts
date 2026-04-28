@@ -4,6 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { MessService } from '../services/mess.service';
 import { MessEnrollment, MessNotification, MessStats } from '../models/mess.model';
+import { RebateService } from '../services/rebate.service';
+import { RebateRequest } from '../models/rebate.model';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -26,20 +28,28 @@ export class ManagerDashboardComponent implements OnInit, OnDestroy {
   couponInput = '';
   validationMessage = '';
 
+  // Rebate data
+  pendingRebates: RebateRequest[] = [];
+  allRebates: RebateRequest[] = [];
+  rebateActionMsg = '';
+
   private subscriptions: Subscription[] = [];
 
   constructor(
     private readonly router: Router,
-    @Inject(MessService) private readonly messService: MessService
+    @Inject(MessService) private readonly messService: MessService,
+    private readonly rebateService: RebateService
   ) {}
 
   ngOnInit(): void {
     this.loadMessData();
+    this.loadRebateData();
     this.subscriptions.push(
       this.messService.getEnrollments().subscribe(() => this.loadMessData()),
       this.messService.getNotifications().subscribe(notifications => {
-        this.notifications = notifications.slice(0, 5); // Show latest 5 notifications
-      })
+        this.notifications = notifications.slice(0, 5);
+      }),
+      this.rebateService.getRequests().subscribe(() => this.loadRebateData())
     );
   }
 
@@ -51,6 +61,26 @@ export class ManagerDashboardComponent implements OnInit, OnDestroy {
     this.todayEnrollments = this.messService.getTodayEnrollments();
     this.pendingEnrollments = this.messService.getPendingEnrollments();
     this.messStats = this.messService.getTodayStats();
+  }
+
+  loadRebateData(): void {
+    this.pendingRebates = this.rebateService.getPendingRequests();
+    this.allRebates = this.rebateService.getAllManagerRequests().slice(0, 10);
+  }
+
+  approveRebate(id: string): void {
+    this.rebateService.approveRequest(id, this.managerName);
+    this.showRebateMsg('Rebate approved successfully.');
+  }
+
+  rejectRebate(id: string): void {
+    this.rebateService.rejectRequest(id, this.managerName);
+    this.showRebateMsg('Rebate request rejected.');
+  }
+
+  private showRebateMsg(msg: string): void {
+    this.rebateActionMsg = msg;
+    setTimeout(() => (this.rebateActionMsg = ''), 3000);
   }
 
   validateCoupon(): void {
