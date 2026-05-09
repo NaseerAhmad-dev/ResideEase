@@ -5,6 +5,8 @@ import { Student } from '../models/student.model';
 import { StudentService } from '../services/student.service';
 import { MessService } from '../services/mess.service';
 import { MessEnrollment } from '../models/mess.model';
+import { RebateService } from '../services/rebate.service';
+import { RebateRequest, RebateDays } from '../models/rebate.model';
 
 @Component({
   selector: 'app-student-profile',
@@ -16,15 +18,21 @@ import { MessEnrollment } from '../models/mess.model';
 })
 export class StudentProfileComponent implements OnInit {
   student?: Student;
-  activeTab: 'basic' | 'education' | 'hostel' | 'fees' | 'mess' = 'basic';
+  activeTab: 'basic' | 'education' | 'hostel' | 'fees' | 'mess' | 'rebate' = 'basic';
   todayEnrollment?: MessEnrollment;
   couponGenerated = false;
+
+  // Rebate
+  selectedRebateDays: RebateDays = 10;
+  rebateSubmitting = false;
+  rebateSuccessMsg = '';
 
   constructor(
     private readonly route: ActivatedRoute,
     private readonly router: Router,
     @Inject(StudentService) private readonly studentService: StudentService,
-    @Inject(MessService) private readonly messService: MessService
+    @Inject(MessService) private readonly messService: MessService,
+    private readonly rebateService: RebateService
   ) {}
 
   signOut(): void {
@@ -52,7 +60,7 @@ export class StudentProfileComponent implements OnInit {
   }
 
   enrollForMess(): void {
-    if (this.student && !this.todayEnrollment) {
+    if (this.student && !this.todayEnrollment && !this.hasApprovedRebate) {
       const enrollment = this.messService.enrollStudent(this.student);
       if (enrollment) {
         this.todayEnrollment = enrollment;
@@ -61,6 +69,48 @@ export class StudentProfileComponent implements OnInit {
       }
     }
   }
+
+  // ─── Rebate helpers ───────────────────────────────────────────────────
+
+  get activeRebate(): RebateRequest | undefined {
+    if (!this.student) return undefined;
+    return this.rebateService.getActiveRebate(this.student.id);
+  }
+
+  get hasApprovedRebate(): boolean {
+    return this.activeRebate?.status === 'approved';
+  }
+
+  get rebateDayOptions(): RebateDays[] {
+    return [10, 14, 28];
+  }
+
+  selectRebateDays(days: RebateDays): void {
+    this.selectedRebateDays = days;
+  }
+
+  submitRebate(): void {
+    if (!this.student || this.activeRebate) return;
+    this.rebateSubmitting = true;
+    this.rebateService.submitRequest(
+      this.student.id,
+      `${this.student.firstName} ${this.student.lastName}`,
+      this.student.rollNumber,
+      this.selectedRebateDays
+    );
+    this.rebateSubmitting = false;
+    this.rebateSuccessMsg = 'Rebate request submitted successfully!';
+    setTimeout(() => (this.rebateSuccessMsg = ''), 3000);
+  }
+
+  cancelRebate(): void {
+    const rebate = this.activeRebate;
+    if (rebate) {
+      this.rebateService.cancelRequest(rebate.id);
+    }
+  }
+
+  // ─── Fee helpers ──────────────────────────────────────────────────────
 
   get feeStatus(): 'paid' | 'pending' | 'overdue' {
     if (!this.student) return 'pending';

@@ -83,5 +83,15 @@ export const routes: Routes = [
       { path: 'confirmation',   loadComponent: () => import('./components/confirmation/confirmation.component').then(m => m.ConfirmationComponent) }
     ]
   },
+  {
+    path: 'guest',
+    children: [
+      { path: '', redirectTo: 'register', pathMatch: 'full' },
+      {
+        path: 'register',
+        loadComponent: () => import('./guest/guest-register.component').then(m => m.GuestRegisterComponent)
+      }
+    ]
+  },
   { path: '**', redirectTo: 'admin/dashboard' }
 ];

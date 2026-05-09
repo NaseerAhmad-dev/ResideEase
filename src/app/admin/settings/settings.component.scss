@@ -386,3 +386,35 @@
 .toggle input:checked + .toggle-slider:before {
   transform: translateX(26px);
 }
+
+.guest-fee-input {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.currency-sym {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.guest-fee-field {
+  width: 90px;
+  padding: 8px 10px;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+  background: var(--bg-primary);
+  text-align: center;
+  font-family: inherit;
+
+  &:focus {
+    outline: none;
+    border-color: var(--brand);
+    box-shadow: 0 0 0 3px rgba(10, 180, 168, 0.12);
+  }
+}

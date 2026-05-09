@@ -38,6 +38,10 @@ export class HomeComponent {
     this.router.navigate(['/admin/dashboard']);
   }
 
+  registerAsGuest(): void {
+    this.router.navigate(['/guest/register']);
+  }
+
   loginManager(): void {
     this.managerError = '';
     if (this.managerForm.invalid) {

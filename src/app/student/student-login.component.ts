@@ -26,6 +26,10 @@ export class StudentLoginComponent {
     private readonly router: Router
   ) {}
 
+  fillDemo(): void {
+    this.loginForm.setValue({ rollNumber: 'STU001', phone: '9876543210' });
+  }
+
   login(): void {
     this.errorMessage = '';
 

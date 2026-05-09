@@ -6,7 +6,7 @@ import { ROOM_OPTIONS, MEAL_PLANS, DIETARY_OPTIONS } from '../models/onboarding.
   providedIn: 'root'
 })
 export class SettingsService {
-  private settings = signal<AppSettings>({
+  private readonly settings = signal<AppSettings>({
     hostel: {
       name: 'ResideEase Hostel',
       address: '123 University Road, Campus Area',
@@ -28,6 +28,7 @@ export class SettingsService {
       enabled: true
     })),
     dietaryOptions: [...DIETARY_OPTIONS],
+    guestFee: 200,
     system: {
       allowOnlineBooking: true,
       requireApproval: true,
@@ -87,12 +88,11 @@ export class SettingsService {
   }
 
   loadSettings() {
-    // In a real app, this would load from a backend
     const saved = localStorage.getItem('hostel-settings');
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-        this.settings.set(parsed);
+        this.settings.update(current => ({ ...current, ...parsed }));
       } catch (error) {
         console.error('Failed to load settings:', error);
       }

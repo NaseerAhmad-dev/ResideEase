@@ -188,6 +188,56 @@
       </div>
     </section>
 
+    <!-- Rebate Requests Section -->
+    <section class="panel panel--wide">
+      <div class="panel-head">
+        <div>
+          <p class="panel-eyebrow">Rebate management</p>
+          <h2>Student rebate requests</h2>
+        </div>
+        <span class="badge badge--amber" *ngIf="pendingRebates.length > 0">{{ pendingRebates.length }} pending</span>
+        <span class="badge badge--green" *ngIf="pendingRebates.length === 0">All clear</span>
+      </div>
+
+      <div class="rebate-action-msg" *ngIf="rebateActionMsg">
+        <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
+          <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M6.5 10l2.5 2.5 4.5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        {{ rebateActionMsg }}
+      </div>
+
+      <div class="rebate-list" *ngIf="allRebates.length > 0; else noRebates">
+        <div *ngFor="let rebate of allRebates" class="rebate-item">
+          <div class="rebate-item-info">
+            <div class="rebate-item-name">{{ rebate.studentName }}</div>
+            <div class="rebate-item-meta">
+              {{ rebate.rollNumber }} &nbsp;·&nbsp;
+              <strong>{{ rebate.days }} days</strong> &nbsp;·&nbsp;
+              Requested {{ rebate.requestedAt | date:'mediumDate' }}
+            </div>
+          </div>
+          <div class="rebate-item-actions">
+            <span class="rebate-badge rebate-badge--{{ rebate.status }}">{{ rebate.status | titlecase }}</span>
+            <ng-container *ngIf="rebate.status === 'pending'">
+              <button type="button" class="btn-approve" (click)="approveRebate(rebate.id)">Approve</button>
+              <button type="button" class="btn-reject"  (click)="rejectRebate(rebate.id)">Reject</button>
+            </ng-container>
+          </div>
+        </div>
+      </div>
+
+      <ng-template #noRebates>
+        <div class="empty-state">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" opacity="0.3"/>
+            <path d="M8 12l2 2 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <p>No rebate requests yet</p>
+        </div>
+      </ng-template>
+    </section>
+
     <section class="panel">
       <div class="panel-head">
         <div>
