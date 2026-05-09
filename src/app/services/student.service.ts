@@ -7,7 +7,7 @@ import { MessService } from './mess.service';
   providedIn: 'root'
 })
 export class StudentService {
-  private students = new BehaviorSubject<Student[]>([]);
+  private readonly students = new BehaviorSubject<Student[]>([]);
   private readonly STORAGE_KEY = 'hostel-students';
 
   constructor(

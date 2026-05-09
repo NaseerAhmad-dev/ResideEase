@@ -34,4 +34,5 @@ export interface AppSettings {
   meals: MealSettings[];
   dietaryOptions: string[];
   system: SystemSettings;
+  guestFee: number;
 }

@@ -197,6 +197,25 @@
       <div *ngIf="activeTab === 'system'" class="settings-section">
         <h3 class="section-title">System Settings</h3>
         <div class="system-settings">
+
+          <div class="setting-item">
+            <div class="setting-info">
+              <h4 class="setting-title">Guest Registration Fee</h4>
+              <p class="setting-desc">Fee charged to walk-in guests upon registration (₹)</p>
+            </div>
+            <div class="guest-fee-input">
+              <span class="currency-sym">₹</span>
+              <input
+                type="number"
+                class="guest-fee-field"
+                aria-label="Guest registration fee amount in rupees"
+                [(ngModel)]="settings.guestFee"
+                (ngModelChange)="markAsChanged()"
+                min="0"
+                step="50"
+                placeholder="e.g. 200">
+            </div>
+          </div>
           <div class="setting-item">
             <div class="setting-info">
               <h4 class="setting-title">Online Booking</h4>

@@ -263,6 +263,30 @@ input {
   strong { color: var(--text-secondary); }
 }
 
+/* ─── Guest CTA ─────────────────────────── */
+.guest-cta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--text-muted);
+
+  svg { flex-shrink: 0; }
+
+  button {
+    background: none;
+    border: none;
+    color: var(--brand);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: var(--font-sans);
+    padding: 0;
+
+    &:hover { text-decoration: underline; }
+  }
+}
+
 /* ─── Footer ───────────────────────────── */
 .home-footer {
   font-size: 12px;
