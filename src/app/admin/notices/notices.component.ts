@@ -1,26 +1,116 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+import { Notice, NoticeCategory, NoticePriority } from '../../models/notice.model';
+import { NoticeService } from '../../services/notice.service';
 
 @Component({
   selector: 'app-notices',
   standalone: true,
-  imports: [CommonModule, RouterLink],
-  template: `
-    <div style="display:flex;flex-direction:column;gap:20px">
-      <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:10px">
-        <div>
-          <h1 style="font-size:22px;font-weight:700;color:var(--text-primary);letter-spacing:-0.02em">Notices</h1>
-          <p style="font-size:13px;color:var(--text-secondary);margin-top:2px">Manage notices for your hostel</p>
-        </div>
-        <a routerLink="/admin/students/add" style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:var(--brand);color:#fff;border-radius:var(--radius-md);font-size:13.5px;font-weight:600;text-decoration:none;box-shadow:var(--shadow-brand)">+ Add new</a>
-      </div>
-      <div style="background:var(--bg-card);border:1px solid var(--border-light);border-radius:var(--radius-lg);padding:60px 32px;text-align:center;box-shadow:var(--shadow-sm)">
-        <div style="font-size:40px;margin-bottom:12px">🚧</div>
-        <div style="font-size:16px;font-weight:600;color:var(--text-primary);margin-bottom:6px">Notices module coming soon</div>
-        <div style="font-size:13.5px;color:var(--text-secondary)">This section is in the next sprint. Dashboard and Add Student are live.</div>
-      </div>
-    </div>
-  `
+  imports: [CommonModule, FormsModule],
+  templateUrl: './notices.component.html',
+  styleUrl: './notices.component.scss'
 })
-export class NoticesComponent {}
+export class NoticesComponent implements OnInit, OnDestroy {
+  private readonly destroy$ = new Subject<void>();
+
+  allNotices: Notice[]      = [];
+  filteredNotices: Notice[] = [];
+
+  searchQuery    = '';
+  filterCategory = '';
+  filterPriority = '';
+  showPinnedOnly = false;
+  showForm       = false;
+
+  totalNotices = 0;
+  pinnedCount  = 0;
+  urgentCount  = 0;
+  expiredCount = 0;
+
+  form = this.emptyForm();
+
+  constructor(private readonly noticeService: NoticeService) {}
+
+  ngOnInit(): void {
+    this.noticeService.getNotices()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(notices => {
+        this.allNotices = notices;
+        this.computeStats();
+        this.applyFilters();
+      });
+  }
+
+  ngOnDestroy(): void { this.destroy$.next(); this.destroy$.complete(); }
+
+  private computeStats(): void {
+    this.totalNotices = this.allNotices.length;
+    this.pinnedCount  = this.allNotices.filter(n => n.isPinned).length;
+    this.urgentCount  = this.allNotices.filter(n => n.priority === 'urgent').length;
+    this.expiredCount = this.allNotices.filter(n => this.isExpired(n)).length;
+  }
+
+  applyFilters(): void {
+    let result = [...this.allNotices];
+    if (this.searchQuery.trim()) {
+      const q = this.searchQuery.toLowerCase();
+      result = result.filter(n =>
+        n.title.toLowerCase().includes(q) || n.content.toLowerCase().includes(q)
+      );
+    }
+    if (this.filterCategory) result = result.filter(n => n.category === this.filterCategory);
+    if (this.filterPriority) result = result.filter(n => n.priority === this.filterPriority);
+    if (this.showPinnedOnly) result = result.filter(n => n.isPinned);
+    result.sort((a, b) => {
+      if (a.isPinned !== b.isPinned) return a.isPinned ? -1 : 1;
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    });
+    this.filteredNotices = result;
+  }
+
+  clearFilters(): void {
+    this.searchQuery = this.filterCategory = this.filterPriority = '';
+    this.showPinnedOnly = false;
+    this.applyFilters();
+  }
+
+  get hasActiveFilters(): boolean {
+    return !!(this.searchQuery || this.filterCategory || this.filterPriority || this.showPinnedOnly);
+  }
+
+  togglePinnedOnly(): void { this.showPinnedOnly = !this.showPinnedOnly; this.applyFilters(); }
+  toggleForm(): void { this.showForm = !this.showForm; if (!this.showForm) this.form = this.emptyForm(); }
+  togglePin(id: string): void { this.noticeService.togglePin(id); }
+  deleteNotice(id: string): void { this.noticeService.deleteNotice(id); }
+
+  submitNotice(): void {
+    if (!this.form.title.trim() || !this.form.content.trim()) return;
+    this.noticeService.addNotice({
+      title:    this.form.title.trim(),
+      content:  this.form.content.trim(),
+      category: this.form.category,
+      priority: this.form.priority,
+      postedBy: this.form.postedBy.trim() || 'Office Admin',
+      isPinned: this.form.isPinned,
+      expiresAt: this.form.expiresAt || undefined
+    });
+    this.showForm = false;
+    this.form = this.emptyForm();
+  }
+
+  isExpired(n: Notice): boolean {
+    if (!n.expiresAt) return false;
+    return new Date(n.expiresAt) < new Date(new Date().toDateString());
+  }
+
+  getCategoryLabel(cat: string): string {
+    return ({ general: 'General', academic: 'Academic', hostel: 'Hostel', maintenance: 'Maintenance', emergency: 'Emergency' } as Record<string, string>)[cat] ?? cat;
+  }
+
+  private emptyForm(): { title: string; content: string; category: NoticeCategory; priority: NoticePriority; postedBy: string; isPinned: boolean; expiresAt: string } {
+    return { title: '', content: '', category: 'general', priority: 'normal', postedBy: 'Office Admin', isPinned: false, expiresAt: '' };
+  }
+}

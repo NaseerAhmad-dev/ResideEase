@@ -144,8 +144,10 @@ export class AddStudentComponent implements OnInit {
       securityDeposit: formValue.securityDeposit,
       messFee: formValue.messFee,
       totalPayment: this.paymentTotal,
+      paidAmount: 0,
+      paymentStatus: 'partial' as const,
       profilePicture: this.previewUrl || undefined,
-      status: 'active' as const
+      status: 'pending' as const
     };
 
     this.studentService.addStudent(studentData);

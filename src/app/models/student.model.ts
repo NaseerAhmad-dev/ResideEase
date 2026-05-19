@@ -18,7 +18,10 @@ export interface Student {
   securityDeposit: number;
   messFee: number;
   totalPayment: number;
+  paidAmount: number;
+  paymentStatus: 'paid' | 'partial' | 'overdue';
+  lastPaymentDate?: string;
   profilePicture?: string;
   createdAt: string;
-  status: 'active' | 'inactive' | 'pending';
+  status: 'active' | 'inactive' | 'pending' | 'expired' | 'checked_out';
 }

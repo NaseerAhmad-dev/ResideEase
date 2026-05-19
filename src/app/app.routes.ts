@@ -23,6 +23,10 @@ export const routes: Routes = [
         loadComponent: () => import('./admin/add-student/add-student.component').then(m => m.AddStudentComponent)
       },
       {
+        path: 'students/view/:id',
+        loadComponent: () => import('./admin/students/student-view.component').then(m => m.StudentViewComponent)
+      },
+      {
         path: 'rooms',
         loadComponent: () => import('./admin/rooms/rooms.component').then(m => m.RoomsComponent)
       },
@@ -36,7 +40,12 @@ export const routes: Routes = [
       },
       {
         path: 'notices',
-        loadComponent: () => import('./admin/notices/notices.component').then(m => m.NoticesComponent)
+        loadComponent: () => import('./components/notices/notices-board.component').then(m => m.NoticesBoardComponent),
+        data: { postedBy: 'Office Admin' }
+      },
+      {
+        path: 'requests',
+        loadComponent: () => import('./admin/requests/maintenance-requests.component').then(m => m.MaintenanceRequestsComponent)
       },
       {
         path: 'settings',
@@ -67,8 +76,35 @@ export const routes: Routes = [
         loadComponent: () => import('./manager/manager-login.component').then(m => m.ManagerLoginComponent)
       },
       {
-        path: 'dashboard',
-        loadComponent: () => import('./manager/manager-dashboard.component').then(m => m.ManagerDashboardComponent)
+        path: '',
+        loadComponent: () => import('./manager/manager-shell/manager-shell.component').then(m => m.ManagerShellComponent),
+        children: [
+          {
+            path: 'dashboard',
+            loadComponent: () => import('./manager/manager-dashboard.component').then(m => m.ManagerDashboardComponent)
+          },
+          {
+            path: 'mess',
+            loadComponent: () => import('./manager/mess/manager-mess.component').then(m => m.ManagerMessComponent)
+          },
+          {
+            path: 'rebates',
+            loadComponent: () => import('./manager/rebates/manager-rebates.component').then(m => m.ManagerRebatesComponent)
+          },
+          {
+            path: 'notices',
+            loadComponent: () => import('./components/notices/notices-board.component').then(m => m.NoticesBoardComponent),
+            data: { postedBy: 'Hostel Manager' }
+          },
+          {
+            path: 'bills',
+            loadComponent: () => import('./manager/bills/manager-bills.component').then(m => m.ManagerBillsComponent)
+          },
+          {
+            path: 'settings',
+            loadComponent: () => import('./manager/settings/manager-settings.component').then(m => m.ManagerSettingsComponent)
+          }
+        ]
       }
     ]
   },

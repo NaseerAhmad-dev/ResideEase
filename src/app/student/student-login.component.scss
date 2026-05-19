@@ -233,3 +233,61 @@ input {
     color: var(--brand-dark);
   }
 }
+
+/* ─── Mobile (≤ 480px) ───────────────── */
+@media (max-width: 480px) {
+  .login-page {
+    padding: 20px 14px;
+    align-items: flex-start;
+  }
+
+  .login-card {
+    padding: 28px 20px;
+  }
+
+  h1 {
+    font-size: 21px;
+  }
+
+  input {
+    /* prevents iOS automatic zoom on focus */
+    font-size: 16px;
+    padding: 13px 14px;
+  }
+
+  .btn-login {
+    padding: 14px 18px;
+    font-size: 15px;
+  }
+}
+
+/* ─── Very small phones (≤ 390px) ────── */
+@media (max-width: 390px) {
+  .login-page {
+    padding: 0;
+    align-items: stretch;
+  }
+
+  .login-card {
+    width: 100%;
+    min-height: 100dvh;
+    border-radius: 0;
+    box-shadow: none;
+    border: none;
+    padding: 52px 24px 36px;
+  }
+
+  .login-brand {
+    margin-bottom: 32px;
+  }
+
+  .demo-fields {
+    flex-direction: column;
+  }
+
+  .demo-divider {
+    width: 100%;
+    height: 1px;
+    align-self: auto;
+  }
+}

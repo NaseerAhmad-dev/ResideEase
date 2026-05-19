@@ -56,36 +56,36 @@
           </svg>
         </div>
         <div>
-          <div class="panel-info-title">Admin / Office access</div>
-          <div class="panel-info-sub">Manage students, rooms, mess, payments and settings. No credentials required for this demo.</div>
+          <div class="panel-info-title">Office / Admin access</div>
+          <div class="panel-info-sub">Manage students, rooms, mess, payments, maintenance requests and hostel settings.</div>
         </div>
       </div>
 
-      <div class="feature-list">
-        <div class="feature-item">
-          <svg width="13" height="13" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"/><path d="M6.5 10l2.5 2.5 4.5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          Student onboarding &amp; management
+      <form [formGroup]="adminForm" (ngSubmit)="loginAdmin()" novalidate>
+        <div class="field-group">
+          <label for="adm-username">Username</label>
+          <input id="adm-username" type="text" formControlName="username" placeholder="Enter username" autocomplete="username"/>
         </div>
-        <div class="feature-item">
-          <svg width="13" height="13" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"/><path d="M6.5 10l2.5 2.5 4.5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          Room &amp; mess management
+        <div class="field-group">
+          <label for="adm-password">Password</label>
+          <input id="adm-password" type="password" formControlName="password" placeholder="Enter password" autocomplete="current-password"/>
         </div>
-        <div class="feature-item">
-          <svg width="13" height="13" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"/><path d="M6.5 10l2.5 2.5 4.5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          Payments &amp; fee tracking
+        <div class="error-msg" *ngIf="adminError">
+          <svg width="13" height="13" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"/><path d="M10 6v4M10 13v1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          {{ adminError }}
         </div>
-        <div class="feature-item">
-          <svg width="13" height="13" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"/><path d="M6.5 10l2.5 2.5 4.5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          Notices &amp; hostel settings
-        </div>
-      </div>
+        <button class="btn-primary" type="submit">
+          Sign in to Office
+          <svg width="14" height="14" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+            <path d="M4 10h12M10 4l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </form>
 
-      <button class="btn-primary" type="button" (click)="enterAdmin()">
-        Enter admin dashboard
-        <svg width="14" height="14" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-          <path d="M4 10h12M10 4l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </button>
+      <div class="demo-hint">
+        <svg width="13" height="13" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"/><path d="M10 9v5M10 6v1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        Demo credentials &mdash; username: <strong>admin</strong> &nbsp; password: <strong>admin123</strong>
+      </div>
     </div>
 
     <!-- ── Manager panel ── -->

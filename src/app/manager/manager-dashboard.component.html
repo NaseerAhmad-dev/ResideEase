@@ -5,8 +5,6 @@
       <h1>Welcome back, {{ managerName }}</h1>
       <p class="manager-sub">Your manager dashboard for {{ hostelName }} — monitor residents, requests, and facility status.</p>
     </div>
-    <a routerLink="/admin/dashboard" class="btn-outline">Go to admin</a>
-    <button type="button" class="btn-primary" (click)="signOut()">Sign out</button>
   </div>
 
   <div class="manager-stats">
@@ -35,7 +33,7 @@
         <article class="overview-card">
           <p class="overview-card-label">Resident check-ins</p>
           <h3>8</h3>
-          <p class="overview-card-note">Today’s scheduled arrivals</p>
+          <p class="overview-card-note">Today's scheduled arrivals</p>
         </article>
         <article class="overview-card">
           <p class="overview-card-label">Upcoming inspections</p>
@@ -97,147 +95,6 @@
       </div>
     </section>
 
-    <!-- Coupon Validation Section -->
-    <section class="panel">
-      <div class="panel-head">
-        <div>
-          <p class="panel-eyebrow">Coupon validation</p>
-          <h2>Validate meal coupons</h2>
-        </div>
-      </div>
-      <div class="coupon-validation">
-        <div class="coupon-input-group">
-          <input
-            type="text"
-            [(ngModel)]="couponInput"
-            placeholder="Enter coupon number"
-            class="coupon-input"
-            (keyup.enter)="validateCoupon()"
-          >
-          <button type="button" class="btn-primary" (click)="validateCoupon()">Validate</button>
-        </div>
-        <div class="validation-message" *ngIf="validationMessage" [class.success]="validationMessage.includes('✅')" [class.error]="validationMessage.includes('❌')">
-          {{ validationMessage }}
-        </div>
-      </div>
-    </section>
-
-    <!-- Today's Enrollments Section -->
-    <section class="panel">
-      <div class="panel-head">
-        <div>
-          <p class="panel-eyebrow">Today's enrollments</p>
-          <h2>Students enrolled for lunch</h2>
-        </div>
-        <span class="badge badge--sky">{{ pendingEnrollments.length }} pending</span>
-      </div>
-      <div class="enrollment-list">
-        <div *ngFor="let enrollment of pendingEnrollments" class="enrollment-item">
-          <div class="enrollment-info">
-            <div class="enrollment-name">{{ enrollment.studentName }}</div>
-            <div class="enrollment-details">{{ enrollment.rollNumber }} · Coupon: {{ enrollment.couponNumber }}</div>
-          </div>
-          <span class="enrollment-status" [class]="'enrollment-status--' + enrollment.status">
-            {{ enrollment.status === 'enrolled' ? 'Ready' : enrollment.status }}
-          </span>
-        </div>
-        <div *ngIf="pendingEnrollments.length === 0" class="empty-state">
-          <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
-            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" opacity="0.3"/>
-            <path d="M8 12l2 2 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-          <p>No pending enrollments for lunch</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- Notifications Section -->
-    <section class="panel">
-      <div class="panel-head">
-        <div>
-          <p class="panel-eyebrow">Notifications</p>
-          <h2>Recent updates</h2>
-        </div>
-        <div class="notification-actions">
-          <button type="button" class="btn-ghost" (click)="addTimingNotification('lunch')">Add lunch timing</button>
-          <button type="button" class="btn-ghost" (click)="addTimingNotification('dinner')">Add dinner timing</button>
-          <button type="button" class="btn-ghost" (click)="addAnnouncement()">Add notice</button>
-        </div>
-      </div>
-      <div class="notification-list">
-        <div *ngFor="let notification of notifications" class="notification-item" [class.unread]="!notification.isRead">
-          <div class="notification-content">
-            <div class="notification-title">{{ notification.title }}</div>
-            <div class="notification-message">{{ notification.message }}</div>
-            <div class="notification-time">{{ notification.createdAt | date:'short' }}</div>
-          </div>
-          <div class="notification-actions">
-            <span class="notification-priority" [class]="'priority--' + notification.priority">
-              {{ notification.priority }}
-            </span>
-            <button *ngIf="!notification.isRead" type="button" class="btn-ghost" (click)="markNotificationAsRead(notification.id)">Mark read</button>
-          </div>
-        </div>
-        <div *ngIf="notifications.length === 0" class="empty-state">
-          <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
-            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="currentColor" stroke-width="2" opacity="0.3"/>
-            <path d="M14 2v6h6M16 13H8M16 17H8M10 9H8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-          <p>No notifications yet</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- Rebate Requests Section -->
-    <section class="panel panel--wide">
-      <div class="panel-head">
-        <div>
-          <p class="panel-eyebrow">Rebate management</p>
-          <h2>Student rebate requests</h2>
-        </div>
-        <span class="badge badge--amber" *ngIf="pendingRebates.length > 0">{{ pendingRebates.length }} pending</span>
-        <span class="badge badge--green" *ngIf="pendingRebates.length === 0">All clear</span>
-      </div>
-
-      <div class="rebate-action-msg" *ngIf="rebateActionMsg">
-        <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
-          <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"/>
-          <path d="M6.5 10l2.5 2.5 4.5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-        {{ rebateActionMsg }}
-      </div>
-
-      <div class="rebate-list" *ngIf="allRebates.length > 0; else noRebates">
-        <div *ngFor="let rebate of allRebates" class="rebate-item">
-          <div class="rebate-item-info">
-            <div class="rebate-item-name">{{ rebate.studentName }}</div>
-            <div class="rebate-item-meta">
-              {{ rebate.rollNumber }} &nbsp;·&nbsp;
-              <strong>{{ rebate.days }} days</strong> &nbsp;·&nbsp;
-              Requested {{ rebate.requestedAt | date:'mediumDate' }}
-            </div>
-          </div>
-          <div class="rebate-item-actions">
-            <span class="rebate-badge rebate-badge--{{ rebate.status }}">{{ rebate.status | titlecase }}</span>
-            <ng-container *ngIf="rebate.status === 'pending'">
-              <button type="button" class="btn-approve" (click)="approveRebate(rebate.id)">Approve</button>
-              <button type="button" class="btn-reject"  (click)="rejectRebate(rebate.id)">Reject</button>
-            </ng-container>
-          </div>
-        </div>
-      </div>
-
-      <ng-template #noRebates>
-        <div class="empty-state">
-          <svg width="40" height="40" viewBox="0 0 24 24" fill="none">
-            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" opacity="0.3"/>
-            <path d="M8 12l2 2 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-          <p>No rebate requests yet</p>
-        </div>
-      </ng-template>
-    </section>
-
     <section class="panel">
       <div class="panel-head">
         <div>
@@ -246,31 +103,70 @@
         </div>
       </div>
       <div class="action-grid">
-        <button *ngFor="let action of quickActions" class="action-card">
-          <div class="action-icon">•</div>
-          <div>
-            <p class="action-title">{{ action.title }}</p>
-            <p class="action-sub">{{ action.subtitle }}</p>
-          </div>
-        </button>
-      </div>
-    </section>
 
-    <section class="panel">
-      <div class="panel-head">
-        <div>
-          <p class="panel-eyebrow">Tasks</p>
-          <h2>Today’s to-do list</h2>
-        </div>
-      </div>
-      <div class="task-list">
-        <article *ngFor="let task of todayTasks" class="task-item">
-          <div>
-            <p class="task-title">{{ task.title }}</p>
-            <p class="task-status">{{ task.status }}</p>
+        <button type="button" class="action-card action-card--brand">
+          <div class="action-icon-wrap">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+              <rect x="2" y="3" width="16" height="14" rx="2" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M6 8h8M6 12h5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
           </div>
-          <span class="task-dot"></span>
-        </article>
+          <div class="action-body">
+            <p class="action-title">Review room requests</p>
+            <p class="action-sub">Approve or decline room change requests</p>
+          </div>
+          <svg class="action-arrow" width="16" height="16" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+            <path d="M4 10h12M10 4l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+
+        <button type="button" class="action-card action-card--blue">
+          <div class="action-icon-wrap">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+              <path d="M9 10a3 3 0 100-6 3 3 0 000 6zm-6 8a6 6 0 0112 0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              <path d="M14 7a3 3 0 010 6M17 17a6 6 0 00-3-5.2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="action-body">
+            <p class="action-title">Check occupancy</p>
+            <p class="action-sub">View active residents and room status</p>
+          </div>
+          <svg class="action-arrow" width="16" height="16" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+            <path d="M4 10h12M10 4l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+
+        <button type="button" class="action-card action-card--amber">
+          <div class="action-icon-wrap">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+              <path d="M14.5 3.5l2 2-9 9-3 1 1-3 9-9z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M12.5 5.5l2 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="action-body">
+            <p class="action-title">Approve maintenance</p>
+            <p class="action-sub">Authorize pending maintenance tickets</p>
+          </div>
+          <svg class="action-arrow" width="16" height="16" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+            <path d="M4 10h12M10 4l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+
+        <button type="button" class="action-card action-card--green">
+          <div class="action-icon-wrap">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+              <path d="M10 2a6 6 0 00-6 6v3l-2 2v1h16v-1l-2-2V8a6 6 0 00-6-6zm0 16a2 2 0 01-2-2h4a2 2 0 01-2 2z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="action-body">
+            <p class="action-title">Send notice</p>
+            <p class="action-sub">Publish a new announcement to residents</p>
+          </div>
+          <svg class="action-arrow" width="16" height="16" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+            <path d="M4 10h12M10 4l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+
       </div>
     </section>
   </div>
