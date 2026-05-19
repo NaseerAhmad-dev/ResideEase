@@ -95,73 +95,83 @@
           <option value="overdue">Overdue</option>
         </select>
 
-        <button class="btn-clear" type="button" *ngIf="hasActiveFilters" (click)="clearFilters()">
-          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"
-               fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-          </svg>
-          Clear
-        </button>
+        @if (hasActiveFilters) {
+          <button class="btn-clear" type="button" (click)="clearFilters()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"
+                 fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+            Clear
+          </button>
+        }
 
-        <span class="results-count" *ngIf="hasActiveFilters">
-          {{ filteredSubscribers.length }} of {{ totalSubscribers }} students
-        </span>
+        @if (hasActiveFilters) {
+          <span class="results-count">
+            {{ filteredSubscribers.length }} of {{ totalSubscribers }} students
+          </span>
+        }
       </div>
 
       <!-- Table -->
       <div class="table-wrap">
-        <table class="sub-table" *ngIf="filteredSubscribers.length > 0">
-          <thead>
-            <tr>
-              <th>Student</th>
-              <th>Roll No.</th>
-              <th>Room</th>
-              <th>Mess Fee</th>
-              <th>Payment</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let s of filteredSubscribers">
-              <td>
-                <div class="student-cell">
-                  <div class="avatar-sm" [style.background-color]="getAvatarColor(s.firstName)">
-                    {{ s.firstName.charAt(0) }}{{ s.lastName.charAt(0) }}
-                  </div>
-                  <div>
-                    <div class="student-name">{{ s.firstName }} {{ s.lastName }}</div>
-                    <div class="student-dept">{{ s.department || '—' }}</div>
-                  </div>
-                </div>
-              </td>
-              <td class="mono">{{ s.rollNumber }}</td>
-              <td>
-                <span class="room-pill">{{ s.roomNumber || '—' }}</span>
-              </td>
-              <td class="fee-cell">₹{{ s.messFee | number }}<span class="per-mo">/mo</span></td>
-              <td>
-                <p-tag [value]="s.paymentStatus | titlecase"
-                       [severity]="getPaymentSeverity(s.paymentStatus)"></p-tag>
-              </td>
-              <td>
-                <span class="status-dot" [class]="'dot-' + s.status"></span>
-                <span class="status-label">{{ s.status | titlecase }}</span>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        @if (filteredSubscribers.length > 0) {
+          <table class="sub-table">
+            <thead>
+              <tr>
+                <th>Student</th>
+                <th>Roll No.</th>
+                <th>Room</th>
+                <th>Mess Fee</th>
+                <th>Payment</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (s of filteredSubscribers; track s.rollNumber) {
+                <tr>
+                  <td>
+                    <div class="student-cell">
+                      <div class="avatar-sm" [style.background-color]="getAvatarColor(s.firstName)">
+                        {{ s.firstName.charAt(0) }}{{ s.lastName.charAt(0) }}
+                      </div>
+                      <div>
+                        <div class="student-name">{{ s.firstName }} {{ s.lastName }}</div>
+                        <div class="student-dept">{{ s.department || '—' }}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="mono">{{ s.rollNumber }}</td>
+                  <td>
+                    <span class="room-pill">{{ s.roomNumber || '—' }}</span>
+                  </td>
+                  <td class="fee-cell">₹{{ s.messFee | number }}<span class="per-mo">/mo</span></td>
+                  <td>
+                    <p-tag [value]="s.paymentStatus | titlecase"
+                           [severity]="getPaymentSeverity(s.paymentStatus)"></p-tag>
+                  </td>
+                  <td>
+                    <span class="status-dot" [class]="'dot-' + s.status"></span>
+                    <span class="status-label">{{ s.status | titlecase }}</span>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
 
         <!-- Empty -->
-        <div class="empty-state" *ngIf="filteredSubscribers.length === 0">
-          <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24"
-               fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M18 8h1a4 4 0 0 1 0 8h-1"/>
-            <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/>
-            <line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/>
-          </svg>
-          <p>No subscribers match your filters.</p>
-          <button class="btn-clear-empty" type="button" (click)="clearFilters()">Clear filters</button>
-        </div>
+        @if (filteredSubscribers.length === 0) {
+          <div class="empty-state">
+            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24"
+                 fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 8h1a4 4 0 0 1 0 8h-1"/>
+              <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/>
+              <line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/>
+            </svg>
+            <p>No subscribers match your filters.</p>
+            <button class="btn-clear-empty" type="button" (click)="clearFilters()">Clear filters</button>
+          </div>
+        }
       </div>
 
     </p-tabPanel>
@@ -210,13 +220,15 @@
                 Post
               </button>
             </div>
-            <div class="post-success" *ngIf="postSuccess">
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
-                   fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="20 6 9 17 4 12"/>
-              </svg>
-              Announcement posted successfully.
-            </div>
+            @if (postSuccess) {
+              <div class="post-success">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+                     fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="20 6 9 17 4 12"/>
+                </svg>
+                Announcement posted successfully.
+              </div>
+            }
           </div>
         </div>
 
@@ -224,35 +236,43 @@
         <div class="notif-list">
           <div class="notif-list-header">
             Recent Announcements
-            <span class="unread-count" *ngIf="unreadCount > 0">
-              {{ unreadCount }} unread
-            </span>
+            @if (unreadCount > 0) {
+              <span class="unread-count">
+                {{ unreadCount }} unread
+              </span>
+            }
           </div>
 
-          <div class="notif-empty" *ngIf="notifications.length === 0">
-            No announcements yet.
-          </div>
-
-          <div class="notif-item" *ngFor="let n of notifications" [class.is-unread]="!n.isRead">
-            <div class="notif-top">
-              <span class="notif-type-badge" [class]="getNotifTypeClass(n.type)">
-                {{ getNotifTypeLabel(n.type) }}
-              </span>
-              <span class="notif-priority" [class]="getPriorityClass(n.priority)">
-                {{ n.priority | titlecase }}
-              </span>
-              <span class="notif-time">{{ timeAgo(n.createdAt) }}</span>
-              <button class="btn-mark-read" type="button" *ngIf="!n.isRead"
-                      (click)="markRead(n.id)" title="Mark as read">
-                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24"
-                     fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                  <polyline points="20 6 9 17 4 12"/>
-                </svg>
-              </button>
+          @if (notifications.length === 0) {
+            <div class="notif-empty">
+              No announcements yet.
             </div>
-            <div class="notif-title">{{ n.title }}</div>
-            <div class="notif-msg">{{ n.message }}</div>
-          </div>
+          }
+
+          @for (n of notifications; track n.id) {
+            <div class="notif-item" [class.is-unread]="!n.isRead">
+              <div class="notif-top">
+                <span class="notif-type-badge" [class]="getNotifTypeClass(n.type)">
+                  {{ getNotifTypeLabel(n.type) }}
+                </span>
+                <span class="notif-priority" [class]="getPriorityClass(n.priority)">
+                  {{ n.priority | titlecase }}
+                </span>
+                <span class="notif-time">{{ timeAgo(n.createdAt) }}</span>
+                @if (!n.isRead) {
+                  <button class="btn-mark-read" type="button"
+                          (click)="markRead(n.id)" title="Mark as read">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24"
+                         fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="20 6 9 17 4 12"/>
+                    </svg>
+                  </button>
+                }
+              </div>
+              <div class="notif-title">{{ n.title }}</div>
+              <div class="notif-msg">{{ n.message }}</div>
+            </div>
+          }
         </div>
 
       </div>

@@ -110,7 +110,9 @@
 
     <select class="filter-select" [(ngModel)]="filterFloor" (change)="applyFilters()">
       <option value="">All Floors</option>
-      <option *ngFor="let f of floors" [value]="f">Floor {{ f }}</option>
+      @for (f of floors; track f) {
+        <option [value]="f">Floor {{ f }}</option>
+      }
     </select>
 
     <select class="filter-select" [(ngModel)]="filterStatus" (change)="applyFilters()">
@@ -121,90 +123,104 @@
       <option value="maintenance">Maintenance</option>
     </select>
 
-    <button class="btn-clear" type="button" *ngIf="hasActiveFilters" (click)="clearFilters()">
-      <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24"
-           fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-      </svg>
-      Clear
-    </button>
+    @if (hasActiveFilters) {
+      <button class="btn-clear" type="button" (click)="clearFilters()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24"
+             fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+        Clear
+      </button>
+    }
 
-    <span class="results-count" *ngIf="hasActiveFilters">
-      {{ filteredRooms.length }} of {{ totalRooms }} rooms
-    </span>
+    @if (hasActiveFilters) {
+      <span class="results-count">
+        {{ filteredRooms.length }} of {{ totalRooms }} rooms
+      </span>
+    }
   </div>
 
   <!-- ── Room grid ── -->
-  <div class="rooms-grid" *ngIf="filteredRooms.length > 0">
-    <div class="room-card"
-         *ngFor="let room of filteredRooms"
-         [class.is-maintenance]="room.occupancyState === 'maintenance'">
+  @if (filteredRooms.length > 0) {
+    <div class="rooms-grid">
+      @for (room of filteredRooms; track room.roomNumber) {
+        <div class="room-card"
+             [class.is-maintenance]="room.occupancyState === 'maintenance'">
 
-      <!-- Card top strip (colored by state) -->
-      <div class="card-strip" [class]="'strip-' + room.occupancyState"></div>
+          <!-- Card top strip (colored by state) -->
+          <div class="card-strip" [class]="'strip-' + room.occupancyState"></div>
 
-      <!-- Header row: room number + floor chip -->
-      <div class="room-card-header">
-        <div class="room-number-group">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
-               fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"
-               class="room-icon">
-            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-            <polyline points="9 22 9 12 15 12 15 22"/>
-          </svg>
-          <span class="room-number">Room {{ room.roomNumber }}</span>
+          <!-- Header row: room number + floor chip -->
+          <div class="room-card-header">
+            <div class="room-number-group">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                   fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"
+                   class="room-icon">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                <polyline points="9 22 9 12 15 12 15 22"/>
+              </svg>
+              <span class="room-number">Room {{ room.roomNumber }}</span>
+            </div>
+            <span class="floor-chip">Floor {{ room.floor }}</span>
+          </div>
+
+          <!-- Type row -->
+          <div class="room-type-row">
+            <span class="type-badge" [class]="'type-' + room.type">{{ getTypeLabel(room.type) }}</span>
+            <span class="capacity-label">{{ room.capacity }} {{ room.capacity === 1 ? 'bed' : 'beds' }}</span>
+          </div>
+
+          <!-- Occupancy dots -->
+          <div class="occupancy-row">
+            <div class="occ-dots">
+              @for (filled of getOccupancyDots(room); track $index) {
+                <span class="occ-dot"
+                      [class.occ-dot-filled]="filled"
+                      [class.occ-dot-empty]="!filled"></span>
+              }
+            </div>
+            <span class="occ-fraction">{{ room.occupancy }} / {{ room.capacity }}</span>
+          </div>
+
+          <!-- Price -->
+          <div class="room-price">
+            ₹{{ room.price | number }}<span class="per-mo">/mo</span>
+          </div>
+
+          <!-- Amenities -->
+          <div class="amenity-list">
+            @for (a of room.amenities; track a) {
+              <span class="amenity-pill">{{ a }}</span>
+            }
+          </div>
+
+          <!-- Footer: status badge -->
+          <div class="room-card-footer">
+            <span class="occ-badge" [class]="'occ-' + room.occupancyState">
+              {{ getOccupancyLabel(room.occupancyState) }}
+            </span>
+            @if (room.status === 'maintenance') {
+              <span class="room-status-chip">Under Repair</span>
+            }
+          </div>
+
         </div>
-        <span class="floor-chip">Floor {{ room.floor }}</span>
-      </div>
-
-      <!-- Type row -->
-      <div class="room-type-row">
-        <span class="type-badge" [class]="'type-' + room.type">{{ getTypeLabel(room.type) }}</span>
-        <span class="capacity-label">{{ room.capacity }} {{ room.capacity === 1 ? 'bed' : 'beds' }}</span>
-      </div>
-
-      <!-- Occupancy dots -->
-      <div class="occupancy-row">
-        <div class="occ-dots">
-          <span class="occ-dot"
-                *ngFor="let filled of getOccupancyDots(room)"
-                [class.occ-dot-filled]="filled"
-                [class.occ-dot-empty]="!filled"></span>
-        </div>
-        <span class="occ-fraction">{{ room.occupancy }} / {{ room.capacity }}</span>
-      </div>
-
-      <!-- Price -->
-      <div class="room-price">
-        ₹{{ room.price | number }}<span class="per-mo">/mo</span>
-      </div>
-
-      <!-- Amenities -->
-      <div class="amenity-list">
-        <span class="amenity-pill" *ngFor="let a of room.amenities">{{ a }}</span>
-      </div>
-
-      <!-- Footer: status badge -->
-      <div class="room-card-footer">
-        <span class="occ-badge" [class]="'occ-' + room.occupancyState">
-          {{ getOccupancyLabel(room.occupancyState) }}
-        </span>
-        <span class="room-status-chip" *ngIf="room.status === 'maintenance'">Under Repair</span>
-      </div>
-
+      }
     </div>
-  </div>
+  }
 
   <!-- ── Empty state ── -->
-  <div class="empty-state" *ngIf="filteredRooms.length === 0">
-    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24"
-         fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-      <polyline points="9 22 9 12 15 12 15 22"/>
-    </svg>
-    <h3>No rooms found</h3>
-    <p>Try adjusting your search or filters.</p>
-    <button class="btn-clear-empty" type="button" (click)="clearFilters()">Clear filters</button>
-  </div>
+  @if (filteredRooms.length === 0) {
+    <div class="empty-state">
+      <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24"
+           fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+        <polyline points="9 22 9 12 15 12 15 22"/>
+      </svg>
+      <h3>No rooms found</h3>
+      <p>Try adjusting your search or filters.</p>
+      <button class="btn-clear-empty" type="button" (click)="clearFilters()">Clear filters</button>
+    </div>
+  }
 
 </div>
