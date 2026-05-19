@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { Student } from '../models/student.model';
@@ -12,7 +12,6 @@ import { RebateRequest, RebateDays } from '../models/rebate.model';
   selector: 'app-student-profile',
   standalone: true,
   imports: [CommonModule, RouterLink],
-  providers: [StudentService, MessService],
   templateUrl: './student-profile.component.html',
   styleUrls: ['./student-profile.component.scss']
 })
@@ -30,8 +29,8 @@ export class StudentProfileComponent implements OnInit {
   constructor(
     private readonly route: ActivatedRoute,
     private readonly router: Router,
-    @Inject(StudentService) private readonly studentService: StudentService,
-    @Inject(MessService) private readonly messService: MessService,
+    private readonly studentService: StudentService,
+    private readonly messService: MessService,
     private readonly rebateService: RebateService
   ) {}
 
@@ -135,5 +134,11 @@ export class StudentProfileComponent implements OnInit {
   get otherCharges(): number {
     if (!this.student) return 0;
     return this.student.maintenanceCharge + this.student.securityDeposit;
+  }
+
+  get avatarColor(): string {
+    if (!this.student) return '#0ab4a8';
+    const palette = ['#0ab4a8','#3b82f6','#8b5cf6','#ec4899','#f97316','#10b981','#06b6d4','#ef4444'];
+    return palette[(this.student.firstName.codePointAt(0) ?? 0) % palette.length];
   }
 }

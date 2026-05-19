@@ -1,59 +1,73 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
-import { RouterLink } from '@angular/router';
-import { Subject, takeUntil, combineLatest } from 'rxjs';
+import { FormsModule } from '@angular/forms';
+import { Router, RouterLink } from '@angular/router';
+import { Subject, takeUntil } from 'rxjs';
+import { Table, TableModule } from 'primeng/table';
+import { ButtonModule } from 'primeng/button';
+import { InputTextModule } from 'primeng/inputtext';
+import { DropdownModule } from 'primeng/dropdown';
+import { TagModule } from 'primeng/tag';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { ConfirmationService } from 'primeng/api';
 import { Student } from '../../models/student.model';
 import { StudentService } from '../../services/student.service';
 
 @Component({
   selector: 'app-students-list',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [
+    CommonModule, FormsModule, RouterLink,
+    TableModule, ButtonModule, InputTextModule, DropdownModule, TagModule, ConfirmDialogModule
+  ],
+  providers: [ConfirmationService],
   templateUrl: './students-list.component.html',
   styleUrl: './students-list.component.scss'
 })
 export class StudentsListComponent implements OnInit, OnDestroy {
+  @ViewChild('dt') table!: Table;
   private destroy$ = new Subject<void>();
 
   students: Student[] = [];
-  filteredStudents: Student[] = [];
-  selectedStudents: Set<string> = new Set();
+  selectedStudents: Student[] = [];
+  loading = true;
 
-  // Pagination
-  currentPage = 1;
-  pageSize = 10;
-  totalPages = 1;
+  searchValue = '';
+  selectedStatus: string | null = null;
+  selectedGender: string | null = null;
 
-  // Sorting
-  sortField: keyof Student = 'createdAt';
-  sortDirection: 'asc' | 'desc' = 'desc';
-
-  // Filters
-  filterForm!: FormGroup;
-  statusOptions = [
-    { value: 'all', label: 'All Status' },
-    { value: 'active', label: 'Active' },
-    { value: 'inactive', label: 'Inactive' },
-    { value: 'pending', label: 'Pending' }
+  readonly statusOptions = [
+    { label: 'Active',      value: 'active' },
+    { label: 'Pending',     value: 'pending' },
+    { label: 'Expired',     value: 'expired' },
+    { label: 'Checked Out', value: 'checked_out' },
+    { label: 'Inactive',    value: 'inactive' }
   ];
 
-  genderOptions = [
-    { value: 'all', label: 'All Genders' },
-    { value: 'male', label: 'Male' },
-    { value: 'female', label: 'Female' },
-    { value: 'other', label: 'Other' },
-    { value: 'prefer-not', label: 'Prefer not to say' }
+  readonly genderOptions = [
+    { label: 'Male',   value: 'male' },
+    { label: 'Female', value: 'female' },
+    { label: 'Other',  value: 'other' }
+  ];
+
+  private readonly avatarPalette = [
+    '#0ab4a8', '#3b82f6', '#8b5cf6', '#ec4899',
+    '#f97316', '#10b981', '#06b6d4', '#ef4444'
   ];
 
   constructor(
-    private studentService: StudentService,
-    private fb: FormBuilder
+    private readonly studentService: StudentService,
+    private readonly router: Router,
+    private readonly confirmationService: ConfirmationService
   ) {}
 
   ngOnInit(): void {
-    this.initializeFilterForm();
-    this.loadStudents();
+    this.studentService.getStudents()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(students => {
+        this.students = students;
+        this.loading = false;
+      });
   }
 
   ngOnDestroy(): void {
@@ -61,238 +75,105 @@ export class StudentsListComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  private initializeFilterForm(): void {
-    this.filterForm = this.fb.group({
-      search: [''],
-      status: ['all'],
-      gender: ['all'],
-      department: [''],
-      roomType: ['']
-    });
-
-    // Apply filters when form changes
-    this.filterForm.valueChanges
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(() => {
-        this.applyFilters();
-      });
+  onGlobalFilter(event: Event): void {
+    this.table.filterGlobal((event.target as HTMLInputElement).value, 'contains');
   }
 
-  private loadStudents(): void {
-    this.studentService.getStudents()
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(students => {
-        this.students = students;
-        this.applyFilters();
-      });
+  onStatusChange(value: string | null): void {
+    this.table.filter(value, 'status', 'equals');
   }
 
-  private applyFilters(): void {
-    const filters = this.filterForm.value;
-    let filtered = [...this.students];
-
-    // Search filter
-    if (filters.search) {
-      const searchTerm = filters.search.toLowerCase();
-      filtered = filtered.filter(student =>
-        student.firstName.toLowerCase().includes(searchTerm) ||
-        student.lastName.toLowerCase().includes(searchTerm) ||
-        student.email.toLowerCase().includes(searchTerm) ||
-        student.rollNumber.toLowerCase().includes(searchTerm) ||
-        student.phone.includes(searchTerm)
-      );
-    }
-
-    // Status filter
-    if (filters.status !== 'all') {
-      filtered = filtered.filter(student => student.status === filters.status);
-    }
-
-    // Gender filter
-    if (filters.gender !== 'all') {
-      filtered = filtered.filter(student => student.gender === filters.gender);
-    }
-
-    // Department filter
-    if (filters.department) {
-      filtered = filtered.filter(student =>
-        student.department?.toLowerCase().includes(filters.department.toLowerCase())
-      );
-    }
-
-    // Room type filter
-    if (filters.roomType) {
-      filtered = filtered.filter(student =>
-        student.selectedRoom.toLowerCase().includes(filters.roomType.toLowerCase())
-      );
-    }
-
-    // Apply sorting
-    filtered.sort((a, b) => {
-      const aValue = a[this.sortField];
-      const bValue = b[this.sortField];
-
-      // Handle undefined/null values
-      if (aValue == null && bValue == null) return 0;
-      if (aValue == null) return this.sortDirection === 'asc' ? -1 : 1;
-      if (bValue == null) return this.sortDirection === 'asc' ? 1 : -1;
-
-      if (aValue < bValue) return this.sortDirection === 'asc' ? -1 : 1;
-      if (aValue > bValue) return this.sortDirection === 'asc' ? 1 : -1;
-      return 0;
-    });
-
-    this.filteredStudents = filtered;
-    this.totalPages = Math.ceil(filtered.length / this.pageSize);
-    this.currentPage = Math.min(this.currentPage, this.totalPages || 1);
-  }
-
-  sortBy(field: keyof Student): void {
-    if (this.sortField === field) {
-      this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
-    } else {
-      this.sortField = field;
-      this.sortDirection = 'asc';
-    }
-    this.applyFilters();
-  }
-
-  getSortIcon(field: keyof Student): string {
-    if (this.sortField !== field) return '↕️';
-    return this.sortDirection === 'asc' ? '↑' : '↓';
-  }
-
-  get paginatedStudents(): Student[] {
-    const start = (this.currentPage - 1) * this.pageSize;
-    const end = start + this.pageSize;
-    return this.filteredStudents.slice(start, end);
-  }
-
-  goToPage(page: number): void {
-    if (page >= 1 && page <= this.totalPages) {
-      this.currentPage = page;
-    }
-  }
-
-  toggleStudentSelection(studentId: string): void {
-    if (this.selectedStudents.has(studentId)) {
-      this.selectedStudents.delete(studentId);
-    } else {
-      this.selectedStudents.add(studentId);
-    }
-  }
-
-  selectAllStudents(): void {
-    if (this.selectedStudents.size === this.paginatedStudents.length) {
-      this.selectedStudents.clear();
-    } else {
-      this.paginatedStudents.forEach(student => this.selectedStudents.add(student.id));
-    }
-  }
-
-  isAllSelected(): boolean {
-    return this.paginatedStudents.length > 0 &&
-           this.selectedStudents.size === this.paginatedStudents.length;
-  }
-
-  deleteSelectedStudents(): void {
-    if (confirm(`Are you sure you want to delete ${this.selectedStudents.size} student(s)?`)) {
-      this.selectedStudents.forEach(id => this.studentService.deleteStudent(id));
-      this.selectedStudents.clear();
-    }
-  }
-
-  deleteStudent(student: Student): void {
-    if (confirm(`Are you sure you want to delete ${student.firstName} ${student.lastName}?`)) {
-      this.studentService.deleteStudent(student.id);
-    }
-  }
-
-  exportToCSV(): void {
-    const headers = [
-      'ID', 'First Name', 'Last Name', 'Email', 'Phone', 'Roll Number',
-      'Gender', 'Department', 'Check-in Date', 'Room Number', 'Current Semester',
-      'Residence Expiry', 'Room Type', 'Room Price', 'Residency Account',
-      'Maintenance Charge', 'Security Deposit', 'Mess Fee', 'Total Payment', 'Status', 'Created At'
-    ];
-
-    const csvData = this.filteredStudents.map(student => [
-      student.id,
-      student.firstName,
-      student.lastName,
-      student.email,
-      student.phone,
-      student.rollNumber,
-      student.gender,
-      student.department || '',
-      student.checkInDate,
-      student.roomNumber || '',
-      student.currentSemester,
-      student.residenceExpiry,
-      student.selectedRoom,
-      student.roomPrice,
-      student.residencyAccount,
-      student.maintenanceCharge,
-      student.securityDeposit,
-      student.messFee,
-      student.totalPayment,
-      student.status,
-      new Date(student.createdAt).toLocaleDateString()
-    ]);
-
-    const csvContent = [headers, ...csvData]
-      .map(row => row.map(field => `"${field}"`).join(','))
-      .join('\n');
-
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    const url = URL.createObjectURL(blob);
-    link.setAttribute('href', url);
-    link.setAttribute('download', `students_${new Date().toISOString().split('T')[0]}.csv`);
-    link.style.visibility = 'hidden';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  }
-
-  exportToJSON(): void {
-    const dataStr = JSON.stringify(this.filteredStudents, null, 2);
-    const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-
-    const exportFileDefaultName = `students_${new Date().toISOString().split('T')[0]}.json`;
-
-    const linkElement = document.createElement('a');
-    linkElement.setAttribute('href', dataUri);
-    linkElement.setAttribute('download', exportFileDefaultName);
-    linkElement.click();
+  onGenderChange(value: string | null): void {
+    this.table.filter(value, 'gender', 'equals');
   }
 
   clearFilters(): void {
-    this.filterForm.reset({
-      search: '',
-      status: 'all',
-      gender: 'all',
-      department: '',
-      roomType: ''
+    this.searchValue = '';
+    this.selectedStatus = null;
+    this.selectedGender = null;
+    this.table.clear();
+  }
+
+  isRowSelected(student: Student): boolean {
+    return this.selectedStudents.some(s => s.id === student.id);
+  }
+
+  navigateToView(id: string): void {
+    this.router.navigate(['/admin/students/view', id]);
+  }
+
+  navigateToEdit(id: string): void {
+    this.router.navigate(['/admin/students/edit', id]);
+  }
+
+  deleteStudent(student: Student, event: Event): void {
+    event.stopPropagation();
+    this.confirmationService.confirm({
+      key: 'checkoutConfirm',
+      message: `Check out <strong>${student.firstName} ${student.lastName}</strong>?<br>Their status will be updated to <em>Checked Out</em>.`,
+      header: 'Confirm Check Out',
+      acceptLabel: 'Yes, Check Out',
+      rejectLabel: 'Cancel',
+      accept: () => {
+        this.studentService.updateStudent(student.id, { status: 'checked_out' });
+      }
     });
   }
 
-  getStatusColor(status: string): string {
-    switch (status) {
-      case 'active': return '#10b981';
-      case 'inactive': return '#6b7280';
-      case 'pending': return '#f59e0b';
-      default: return '#6b7280';
-    }
+  deleteSelected(): void {
+    const count = this.selectedStudents.length;
+    this.confirmationService.confirm({
+      key: 'checkoutConfirm',
+      message: `Check out <strong>${count} student${count !== 1 ? 's' : ''}</strong>?<br>Their statuses will be updated to <em>Checked Out</em>.`,
+      header: 'Confirm Bulk Check Out',
+      acceptLabel: 'Yes, Check Out All',
+      rejectLabel: 'Cancel',
+      accept: () => {
+        this.selectedStudents.forEach(s =>
+          this.studentService.updateStudent(s.id, { status: 'checked_out' })
+        );
+        this.selectedStudents = [];
+      }
+    });
   }
 
-  getGenderLabel(gender: string): string {
-    switch (gender) {
-      case 'male': return 'Male';
-      case 'female': return 'Female';
-      case 'other': return 'Other';
-      case 'prefer-not': return 'Prefer not to say';
-      default: return gender;
-    }
+  getStatusSeverity(status: string): 'success' | 'warning' | 'secondary' | 'info' | 'danger' {
+    const map: Record<string, 'success' | 'warning' | 'secondary' | 'info' | 'danger'> = {
+      active:      'success',
+      pending:     'warning',
+      expired:     'danger',
+      checked_out: 'secondary',
+      inactive:    'secondary'
+    };
+    return map[status] ?? 'info';
+  }
+
+  getAvatarColor(name: string): string {
+    return this.avatarPalette[name.charCodeAt(0) % this.avatarPalette.length];
+  }
+
+  exportToCSV(): void {
+    const headers = ['First Name', 'Last Name', 'Email', 'Phone', 'Roll No.', 'Gender', 'Department', 'Semester', 'Room', 'Room Price', 'Status', 'Joined'];
+    const rows = this.students.map(s => [
+      s.firstName, s.lastName, s.email, s.phone, s.rollNumber,
+      s.gender, s.department ?? '', s.currentSemester, s.selectedRoom,
+      s.roomPrice, s.status, new Date(s.createdAt).toLocaleDateString()
+    ]);
+    const csv = [headers, ...rows].map(r => r.map(f => `"${f}"`).join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `students_${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  exportToJSON(): void {
+    const uri = 'data:application/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(this.students, null, 2));
+    const a = document.createElement('a');
+    a.href = uri;
+    a.download = `students_${new Date().toISOString().split('T')[0]}.json`;
+    a.click();
   }
 }

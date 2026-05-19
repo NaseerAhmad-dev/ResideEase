@@ -1,4 +1,4 @@
-import { Component, Inject } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -8,7 +8,6 @@ import { StudentService } from '../services/student.service';
   selector: 'app-student-login',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
-  providers: [StudentService],
   templateUrl: './student-login.component.html',
   styleUrls: ['./student-login.component.scss']
 })
@@ -22,12 +21,12 @@ export class StudentLoginComponent {
 
   constructor(
     private readonly fb: FormBuilder,
-    @Inject(StudentService) private readonly studentService: StudentService,
+    private readonly studentService: StudentService,
     private readonly router: Router
   ) {}
 
   fillDemo(): void {
-    this.loginForm.setValue({ rollNumber: 'STU001', phone: '9876543210' });
+    this.loginForm.setValue({ rollNumber: 'CS2021001', phone: '9419001234' });
   }
 
   login(): void {

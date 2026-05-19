@@ -9,8 +9,10 @@ import { Student } from '../models/student.model';
 export class MessService {
   private enrollments = new BehaviorSubject<MessEnrollment[]>([]);
   private notifications = new BehaviorSubject<MessNotification[]>([]);
-  private readonly ENROLLMENTS_KEY = 'mess-enrollments';
-  private readonly NOTIFICATIONS_KEY = 'mess-notifications';
+  private readonly ENROLLMENTS_KEY    = 'mess-enrollments';
+  private readonly NOTIFICATIONS_KEY  = 'mess-notifications';
+  private readonly NOTIF_VERSION_KEY  = 'mess-notifications-version';
+  private readonly NOTIF_SEED_VERSION = 'v1-initial';
 
   constructor() {
     this.loadEnrollments();
@@ -194,14 +196,49 @@ export class MessService {
 
   private loadEnrollments(): void {
     try {
+      const today = new Date().toISOString().split('T')[0];
       const stored = localStorage.getItem(this.ENROLLMENTS_KEY);
-      if (stored) {
-        const parsedEnrollments = JSON.parse(stored);
-        this.enrollments.next(parsedEnrollments);
+      const existing: MessEnrollment[] = stored ? JSON.parse(stored) : [];
+      const hasTodayData = existing.some(e => e.enrollmentDate === today);
+      if (!hasTodayData) {
+        const seeded = [...existing, ...this.getSeedEnrollments()];
+        this.enrollments.next(seeded);
+        this.saveEnrollmentsToStorage(seeded);
+      } else {
+        this.enrollments.next(existing);
       }
     } catch (error) {
       console.error('Failed to load enrollments from storage:', error);
     }
+  }
+
+  private getSeedEnrollments(): MessEnrollment[] {
+    const today = new Date().toISOString().split('T')[0];
+    const seed = [
+      { roll: 'CSE-221', name: 'Aanya Sharma',  meal: 'both',   served: true,  minsAgo: 90 },
+      { roll: 'CSE-222', name: 'Rohan Mehta',   meal: 'lunch',  served: true,  minsAgo: 70 },
+      { roll: 'ECE-301', name: 'Priya Patel',   meal: 'dinner', served: true,  minsAgo: 45 },
+      { roll: 'ME-412',  name: 'Arjun Kumar',   meal: 'both',   served: false, minsAgo: 0  },
+      { roll: 'CSE-223', name: 'Sneha Iyer',    meal: 'both',   served: false, minsAgo: 0  },
+      { roll: 'ECE-302', name: 'Vikram Singh',  meal: 'lunch',  served: false, minsAgo: 0  },
+      { roll: 'CSE-224', name: 'Deepa Nair',    meal: 'dinner', served: false, minsAgo: 0  },
+      { roll: 'ME-413',  name: 'Rahul Gupta',   meal: 'both',   served: false, minsAgo: 0  },
+      { roll: 'CSE-225', name: 'Kavya Reddy',   meal: 'lunch',  served: false, minsAgo: 0  },
+      { roll: 'ECE-303', name: 'Nikhil Joshi',  meal: 'dinner', served: true,  minsAgo: 30 },
+    ];
+    return seed.map((s, i) => ({
+      id: `seed_enr_${i}`,
+      studentId: `seed_stu_${i}`,
+      studentName: s.name,
+      rollNumber: s.roll,
+      couponNumber: `M${today.replace(/-/g, '')}${1001 + i}`,
+      enrollmentDate: today,
+      mealType: s.meal as MessEnrollment['mealType'],
+      status: s.served ? ('served' as const) : ('enrolled' as const),
+      servedAt: s.served ? new Date(Date.now() - s.minsAgo * 60000).toISOString() : undefined,
+      servedBy: s.served ? 'Manager' : undefined,
+      createdAt: new Date(Date.now() - 120 * 60000).toISOString()
+    }));
   }
 
   private saveEnrollmentsToStorage(enrollments: MessEnrollment[]): void {
@@ -214,21 +251,58 @@ export class MessService {
 
   private loadNotifications(): void {
     try {
-      const stored = localStorage.getItem(this.NOTIFICATIONS_KEY);
-      if (stored) {
-        const parsedNotifications = JSON.parse(stored);
-        this.notifications.next(parsedNotifications);
+      const storedVersion = localStorage.getItem(this.NOTIF_VERSION_KEY);
+      if (storedVersion !== this.NOTIF_SEED_VERSION) {
+        const seed = this.getSeedNotifications();
+        this.notifications.next(seed);
+        localStorage.setItem(this.NOTIFICATIONS_KEY, JSON.stringify(seed));
+        localStorage.setItem(this.NOTIF_VERSION_KEY, this.NOTIF_SEED_VERSION);
+      } else {
+        const stored = localStorage.getItem(this.NOTIFICATIONS_KEY);
+        this.notifications.next(stored ? JSON.parse(stored) : []);
       }
-    } catch (error) {
-      console.error('Failed to load notifications from storage:', error);
+    } catch {
+      this.notifications.next([]);
     }
   }
 
   private saveNotificationsToStorage(notifications: MessNotification[]): void {
-    try {
-      localStorage.setItem(this.NOTIFICATIONS_KEY, JSON.stringify(notifications));
-    } catch (error) {
-      console.error('Failed to save notifications to storage:', error);
-    }
+    try { localStorage.setItem(this.NOTIFICATIONS_KEY, JSON.stringify(notifications)); } catch { /* noop */ }
+  }
+
+  private getSeedNotifications(): MessNotification[] {
+    const daysAgo = (d: number) => new Date(Date.now() - d * 86400000).toISOString();
+    return [
+      {
+        id: 'notif_001', type: 'announcement',
+        title: 'Mess Timing Update',
+        message: 'Lunch will be served from 12:30 PM – 2:00 PM and Dinner from 7:30 PM – 9:00 PM, effective this Monday.',
+        priority: 'high', isRead: false, createdAt: daysAgo(1)
+      },
+      {
+        id: 'notif_002', type: 'announcement',
+        title: 'Special Menu – Eid Celebration',
+        message: 'A special menu featuring biryani, korma, and sheer khurma will be served for all hostel residents.',
+        priority: 'medium', isRead: true, createdAt: daysAgo(5)
+      },
+      {
+        id: 'notif_003', type: 'maintenance',
+        title: 'Mess Closed – Sunday Deep Clean',
+        message: 'The mess will be closed this Sunday for deep cleaning. Packed meals will be provided at 1:00 PM and 8:00 PM.',
+        priority: 'high', isRead: false, createdAt: daysAgo(2)
+      },
+      {
+        id: 'notif_004', type: 'announcement',
+        title: 'Monthly Feedback Form',
+        message: 'Please fill the mess feedback form available at the mess counter. Your feedback helps improve food quality.',
+        priority: 'low', isRead: true, createdAt: daysAgo(8)
+      },
+      {
+        id: 'notif_005', type: 'timing',
+        title: 'Breakfast Added',
+        message: 'Starting next week, breakfast (7:30 AM – 9:00 AM) will be included in the monthly mess fee at no extra charge.',
+        priority: 'medium', isRead: false, createdAt: daysAgo(3)
+      }
+    ];
   }
 }

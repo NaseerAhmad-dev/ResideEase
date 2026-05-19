@@ -15,6 +15,11 @@ import { StudentService } from '../services/student.service';
 export class HomeComponent {
   activeTab: 'admin' | 'manager' | 'student' = 'admin';
 
+  adminForm = this.fb.group({
+    username: ['', Validators.required],
+    password: ['', Validators.required]
+  });
+
   managerForm = this.fb.group({
     username: ['', Validators.required],
     password: ['', Validators.required]
@@ -25,6 +30,7 @@ export class HomeComponent {
     phone: ['', Validators.required]
   });
 
+  adminError   = '';
   managerError = '';
   studentError = '';
 
@@ -34,8 +40,18 @@ export class HomeComponent {
     @Inject(StudentService) private readonly studentService: StudentService
   ) {}
 
-  enterAdmin(): void {
-    this.router.navigate(['/admin/dashboard']);
+  loginAdmin(): void {
+    this.adminError = '';
+    if (this.adminForm.invalid) {
+      this.adminError = 'Please enter username and password.';
+      return;
+    }
+    const { username, password } = this.adminForm.value;
+    if (username === 'admin' && password === 'admin123') {
+      this.router.navigate(['/admin/dashboard']);
+    } else {
+      this.adminError = 'Invalid credentials. Please try again.';
+    }
   }
 
   registerAsGuest(): void {

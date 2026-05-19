@@ -1,7 +1,7 @@
 <div class="admin-layout" [class.sidebar-collapsed]="!sidebarOpen()">
 
   <!-- Sidebar -->
-  <aside class="sidebar" role="navigation" aria-label="Admin navigation">
+  <aside class="sidebar" aria-label="Admin sidebar">
 
     <!-- Brand -->
     <div class="sidebar-brand">
@@ -15,7 +15,7 @@
     </div>
 
     <!-- Primary nav -->
-    <nav class="sidebar-nav">
+    <nav class="sidebar-nav" aria-label="Main menu">
       <div class="nav-label" *ngIf="sidebarOpen()">Main menu</div>
       @for (item of navItems; track item.route) {
         <a class="nav-item"
@@ -32,6 +32,7 @@
               <svg *ngSwitchCase="'credit'" width="18" height="18" viewBox="0 0 20 20" fill="none"><rect x="2" y="5" width="16" height="12" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M2 9h16" stroke="currentColor" stroke-width="1.5"/></svg>
               <svg *ngSwitchCase="'bell'"   width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M10 2a6 6 0 00-6 6v3l-2 2v1h16v-1l-2-2V8a6 6 0 00-6-6zm0 16a2 2 0 01-2-2h4a2 2 0 01-2 2z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
               <svg *ngSwitchCase="'gear'"   width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M10 13a3 3 0 100-6 3 3 0 000 6z" stroke="currentColor" stroke-width="1.5"/><path d="M17.7 10.9l-1.4-.8a6 6 0 000-2.2l1.4-.8a1 1 0 00.4-1.3l-1-1.7a1 1 0 00-1.3-.4l-1.4.8a6 6 0 00-1.9-1.1V1.7A1 1 0 0011.5 1h-3a1 1 0 00-1 1v1.4A6 6 0 005.6 4.5l-1.4-.8a1 1 0 00-1.3.4l-1 1.7a1 1 0 00.4 1.3l1.4.8a6 6 0 000 2.2l-1.4.8a1 1 0 00-.4 1.3l1 1.7a1 1 0 001.3.4l1.4-.8a6 6 0 001.9 1.1v1.4a1 1 0 001 1h3a1 1 0 001-1v-1.4a6 6 0 001.9-1.1l1.4.8a1 1 0 001.3-.4l1-1.7a1 1 0 00-.4-1.3z" stroke="currentColor" stroke-width="1.3"/></svg>
+              <svg *ngSwitchCase="'wrench'" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
             </ng-container>
           </span>
           <span class="nav-label-text" *ngIf="sidebarOpen()">{{ item.label }}</span>
@@ -61,15 +62,34 @@
 
       <!-- User avatar -->
       <div class="nav-user" *ngIf="sidebarOpen()">
-        <div class="user-avatar">W</div>
+        <div class="user-avatar">O</div>
         <div class="user-info">
-          <div class="user-name">Warden Admin</div>
+          <div class="user-name">Office Admin</div>
           <div class="user-role">Sunrise Engineering</div>
         </div>
       </div>
       <div class="nav-user-mini" *ngIf="!sidebarOpen()">
-        <div class="user-avatar">W</div>
+        <div class="user-avatar">O</div>
       </div>
+
+      <!-- Sign out -->
+      <button class="btn-signout" *ngIf="sidebarOpen()" (click)="signOut()" type="button">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+          <polyline points="16 17 21 12 16 7"/>
+          <line x1="21" y1="12" x2="9" y2="12"/>
+        </svg>
+        Sign Out
+      </button>
+      <button class="btn-signout-mini" *ngIf="!sidebarOpen()" (click)="signOut()" type="button" title="Sign Out">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+          <polyline points="16 17 21 12 16 7"/>
+          <line x1="21" y1="12" x2="9" y2="12"/>
+        </svg>
+      </button>
     </div>
 
   </aside>
@@ -96,13 +116,59 @@
       </div>
 
       <div class="topbar-actions">
-        <button class="icon-btn" aria-label="Notifications">
-          <svg width="18" height="18" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-            <path d="M10 2a6 6 0 00-6 6v3l-2 2v1h16v-1l-2-2V8a6 6 0 00-6-6zm0 16a2 2 0 01-2-2h4a2 2 0 01-2 2z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
-          </svg>
-          <span class="notif-dot" aria-label="You have notifications"></span>
-        </button>
-        <div class="topbar-avatar" aria-label="Admin profile">W</div>
+
+        <!-- Notification bell -->
+        <div class="dropdown-wrap">
+          <button class="icon-btn" (click)="toggleNotifications($event)" aria-label="Notifications" [attr.aria-expanded]="showNotifications()">
+            <svg width="18" height="18" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+              <path d="M10 2a6 6 0 00-6 6v3l-2 2v1h16v-1l-2-2V8a6 6 0 00-6-6zm0 16a2 2 0 01-2-2h4a2 2 0 01-2 2z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+            </svg>
+            <span *ngIf="unreadCount() > 0" class="notif-dot" [attr.aria-label]="unreadCount() + ' unread notifications'"></span>
+          </button>
+
+          <div *ngIf="showNotifications()" class="notif-panel" aria-label="Notifications">
+            <div class="notif-panel-head">
+              <span class="notif-panel-title">Notifications</span>
+              <span *ngIf="unreadCount() > 0" class="notif-badge">{{ unreadCount() }} new</span>
+              <button class="notif-mark-read" (click)="markAllRead()" *ngIf="unreadCount() > 0" type="button">Mark all read</button>
+            </div>
+            <div class="notif-list">
+              <div *ngFor="let n of notifications" class="notif-item" [class.notif-item--unread]="!n.read">
+                <span class="notif-indicator" [ngClass]="'notif-indicator--' + n.type"></span>
+                <div class="notif-body">
+                  <p class="notif-title">{{ n.title }}</p>
+                  <p class="notif-msg">{{ n.message }}</p>
+                  <span class="notif-time">{{ n.time }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Profile avatar -->
+        <div class="dropdown-wrap">
+          <button class="topbar-avatar" (click)="toggleProfileMenu($event)" aria-label="Admin profile menu" [attr.aria-expanded]="showProfileMenu()" type="button">O</button>
+
+          <div *ngIf="showProfileMenu()" class="profile-menu" role="menu">
+            <div class="profile-menu-header">
+              <div class="profile-menu-avatar">O</div>
+              <div>
+                <p class="profile-menu-name">Office Admin</p>
+                <p class="profile-menu-role">Hostel Office</p>
+              </div>
+            </div>
+            <hr class="profile-menu-divider">
+            <button class="profile-menu-item" (click)="goToSettings()" type="button" role="menuitem">
+              <svg width="15" height="15" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M10 13a3 3 0 100-6 3 3 0 000 6z" stroke="currentColor" stroke-width="1.5"/><path d="M17.7 10.9l-1.4-.8a6 6 0 000-2.2l1.4-.8a1 1 0 00.4-1.3l-1-1.7a1 1 0 00-1.3-.4l-1.4.8a6 6 0 00-1.9-1.1V1.7A1 1 0 0011.5 1h-3a1 1 0 00-1 1v1.4A6 6 0 005.6 4.5l-1.4-.8a1 1 0 00-1.3.4l-1 1.7a1 1 0 00.4 1.3l1.4.8a6 6 0 000 2.2l-1.4.8a1 1 0 00-.4 1.3l1 1.7a1 1 0 001.3.4l1.4-.8a6 6 0 001.9 1.1v1.4a1 1 0 001 1h3a1 1 0 001-1v-1.4a6 6 0 001.9-1.1l1.4.8a1 1 0 001.3-.4l1-1.7a1 1 0 00-.4-1.3z" stroke="currentColor" stroke-width="1.3"/></svg>
+              Settings
+            </button>
+            <button class="profile-menu-item profile-menu-item--danger" (click)="signOut()" type="button" role="menuitem">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+              Sign Out
+            </button>
+          </div>
+        </div>
+
       </div>
     </header>
 
