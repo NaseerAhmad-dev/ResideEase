@@ -1,0 +1,201 @@
+<div class="audit-page">
+
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Billing Audit</h1>
+      <p class="page-subtitle">Verify that student mess bills reconcile with supplier costs</p>
+    </div>
+  </div>
+
+  <!-- Controls -->
+  <div class="controls-card">
+    <div class="controls-inner">
+      <div class="control-group">
+        <label class="control-label" for="select-month">Month</label>
+        <select id="select-month" class="ctrl-select" [(ngModel)]="selectedMonth">
+          @for (mo of months; track mo.value) {
+            <option [value]="mo.value">{{ mo.label }}</option>
+          }
+        </select>
+      </div>
+      <div class="control-group">
+        <label class="control-label" for="select-year">Year</label>
+        <select id="select-year" class="ctrl-select" [(ngModel)]="selectedYear">
+          @for (y of years; track y) {
+            <option [value]="y">{{ y }}</option>
+          }
+        </select>
+      </div>
+      <button class="btn-run" (click)="runAudit()">
+        <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
+          <path d="M4 10a6 6 0 106-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          <path d="M4 6v4h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Run Audit
+      </button>
+    </div>
+    @if (hasRun && result) {
+      <p class="audit-period-label">
+        Showing results for
+        <strong>{{ monthLabel }} {{ result.year }}</strong>
+        &nbsp;·&nbsp; {{ result.daysInMonth }} days
+      </p>
+    }
+  </div>
+
+  @if (hasRun && result) {
+
+    <!-- Summary cards -->
+    <div class="summary-row">
+      <div class="summary-card">
+        <div class="summary-icon summary-icon--blue">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <rect x="3" y="2" width="14" height="16" rx="2" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M7 7h6M7 10h6M7 13h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="summary-body">
+          <span class="summary-value">INR {{ result.totalSupplierBill | number:'1.0-0' }}</span>
+          <span class="summary-label">Total Supplier Cost</span>
+          <span class="summary-sub">{{ result.billCount }} bill{{ result.billCount !== 1 ? 's' : '' }}</span>
+        </div>
+      </div>
+
+      <div class="summary-card">
+        <div class="summary-icon summary-icon--teal">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M10 6v4l3 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="summary-body">
+          <span class="summary-value">INR {{ result.perDayRate | number:'1.2-2' }}</span>
+          <span class="summary-label">Per-Day Rate</span>
+          <span class="summary-sub">÷ {{ result.totalBillableDays }} total billable days</span>
+        </div>
+      </div>
+
+      <div class="summary-card">
+        <div class="summary-icon summary-icon--purple">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <circle cx="8" cy="6" r="3" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M3 18c0-3.314 2.239-6 5-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            <circle cx="14" cy="14" r="3" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M12 14h4M14 12v4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="summary-body">
+          <span class="summary-value">{{ result.studentCount }}</span>
+          <span class="summary-label">Students Billed</span>
+          <span class="summary-sub">{{ result.rebatedCount }} with rebates</span>
+        </div>
+      </div>
+
+      <div class="summary-card">
+        <div class="summary-icon summary-icon--green">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <path d="M4 10a6 6 0 106-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M4 6v4h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="summary-body">
+          <span class="summary-value">INR {{ result.totalStudentBill | number:'1.0-0' }}</span>
+          <span class="summary-label">Total Student Bills</span>
+          <span class="summary-sub">Should equal supplier cost</span>
+        </div>
+      </div>
+    </div>
+
+    @if (result.totalSupplierBill === 0) {
+      <div class="notice notice--warn">
+        <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
+          <path d="M10 3L2 17h16L10 3z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+          <path d="M10 9v4M10 15v.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        No supplier bills found for {{ monthLabel }} {{ result.year }}. All student bills will be INR 0.
+      </div>
+    }
+
+    <!-- Results table -->
+    <div class="table-card">
+      <div class="table-head-row">
+        <h2 class="table-title">Student Breakdown</h2>
+        <span class="table-count">{{ result.rows.length }} student{{ result.rows.length !== 1 ? 's' : '' }}</span>
+      </div>
+
+      <div class="table-scroll">
+        <table class="audit-table">
+          <thead>
+            <tr>
+              <th>Student</th>
+              <th class="col-center">Days in Month</th>
+              <th class="col-center">Rebate Days</th>
+              <th class="col-center">Billable Days</th>
+              <th class="col-right">Per Day Rate</th>
+              <th class="col-right">Bill Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of result.rows; track row.studentId) {
+              <tr [class.row-rebated]="row.rebateDays > 0">
+                <td>
+                  <div class="student-cell">
+                    <div class="avatar">{{ initials(row.studentName) }}</div>
+                    <div class="student-info">
+                      <span class="student-name">{{ row.studentName }}</span>
+                      <span class="student-roll">{{ row.rollNumber }}</span>
+                    </div>
+                  </div>
+                </td>
+                <td class="col-center">
+                  <span class="days-chip days-chip--neutral">{{ result.daysInMonth }}</span>
+                </td>
+                <td class="col-center">
+                  @if (row.rebateDays > 0) {
+                    <span class="days-chip days-chip--rebate">−{{ row.rebateDays }}</span>
+                  } @else {
+                    <span class="cell-muted">—</span>
+                  }
+                </td>
+                <td class="col-center">
+                  <span class="days-chip days-chip--billable">{{ row.billableDays }}</span>
+                </td>
+                <td class="col-right">
+                  <span class="rate-cell">INR {{ result.perDayRate | number:'1.2-2' }}</span>
+                </td>
+                <td class="col-right">
+                  <span class="amount-cell">INR {{ row.billAmount | number:'1.2-2' }}</span>
+                </td>
+              </tr>
+            }
+          </tbody>
+          <tfoot>
+            <tr class="tfoot-row">
+              <td colspan="5" class="tfoot-label">Total Collected from Students</td>
+              <td class="col-right">
+                <span class="tfoot-amount">INR {{ result.totalStudentBill | number:'1.2-2' }}</span>
+              </td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+
+  } @else if (hasRun && !result) {
+    <!-- shouldn't reach here, guard just in case -->
+  } @else {
+    <!-- Initial empty state -->
+    <div class="empty-state">
+      <svg width="52" height="52" viewBox="0 0 52 52" fill="none">
+        <rect x="8" y="6" width="36" height="40" rx="4" stroke="currentColor" stroke-width="1.8"/>
+        <path d="M16 18h20M16 26h20M16 34h12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        <circle cx="40" cy="40" r="8" fill="white" stroke="currentColor" stroke-width="1.8"/>
+        <path d="M37 40h6M40 37v6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+      </svg>
+      <h3>Select a month and run the audit</h3>
+      <p>The system will calculate each student's mess bill based on supplier costs and approved rebates.</p>
+    </div>
+  }
+
+</div>

@@ -7,7 +7,7 @@ export class RebateService {
   private requests = new BehaviorSubject<RebateRequest[]>([]);
   private readonly STORAGE_KEY    = 'hostel-rebates';
   private readonly VERSION_KEY    = 'hostel-rebates-version';
-  private readonly SEED_VERSION   = 'v1-initial';
+  private readonly SEED_VERSION   = 'v2-fix-student-ids';
 
   constructor() {
     this.load();
@@ -109,14 +109,14 @@ export class RebateService {
       return dt.toISOString();
     };
     return [
-      { id: 'reb_seed_001', studentId: 'std_001', studentName: 'Amir Wani',    rollNumber: 'CS2021001', days: 14, status: 'pending',   requestedAt: d(1, 2) },
-      { id: 'reb_seed_002', studentId: 'std_002', studentName: 'Bhat Imran',   rollNumber: 'CS2021002', days: 10, status: 'pending',   requestedAt: d(1, 5) },
-      { id: 'reb_seed_003', studentId: 'std_003', studentName: 'Khalid Mir',   rollNumber: 'CS2021003', days: 28, status: 'approved',  requestedAt: d(5), reviewedAt: reviewed(3), reviewedBy: 'Hostel Manager' },
-      { id: 'reb_seed_004', studentId: 'std_004', studentName: 'Sajad Ahmad',  rollNumber: 'CS2021004', days: 10, status: 'approved',  requestedAt: d(8), reviewedAt: reviewed(6), reviewedBy: 'Hostel Manager' },
-      { id: 'reb_seed_005', studentId: 'std_005', studentName: 'Faisal Lone',  rollNumber: 'CS2021005', days: 14, status: 'rejected',  requestedAt: d(10), reviewedAt: reviewed(8), reviewedBy: 'Hostel Manager' },
-      { id: 'reb_seed_006', studentId: 'std_006', studentName: 'Tariq Sheikh', rollNumber: 'CS2021006', days: 28, status: 'pending',   requestedAt: d(0, 3) },
-      { id: 'reb_seed_007', studentId: 'std_007', studentName: 'Nasir Bhat',   rollNumber: 'CS2021007', days: 10, status: 'cancelled', requestedAt: d(12), reviewedAt: reviewed(12) },
-      { id: 'reb_seed_008', studentId: 'std_008', studentName: 'Umar Dar',     rollNumber: 'CS2021008', days: 14, status: 'approved',  requestedAt: d(15), reviewedAt: reviewed(13), reviewedBy: 'Hostel Manager' },
+      { id: 'reb_seed_001', studentId: 'demo_001', studentName: 'Amir Wani',      rollNumber: 'CS2021001', days: 14, status: 'pending',   requestedAt: d(1, 2) },
+      { id: 'reb_seed_002', studentId: 'demo_011', studentName: 'Imran Parray',  rollNumber: 'IT2021023', days: 10, status: 'pending',   requestedAt: d(1, 5) },
+      { id: 'reb_seed_003', studentId: 'demo_003', studentName: 'Bilal Lone',    rollNumber: 'CE2021003', days: 28, status: 'approved',  requestedAt: d(5), reviewedAt: reviewed(3), reviewedBy: 'Hostel Manager' },
+      { id: 'reb_seed_004', studentId: 'demo_004', studentName: 'Hina Bhat',     rollNumber: 'MA2022067', days: 10, status: 'approved',  requestedAt: d(8), reviewedAt: reviewed(6), reviewedBy: 'Hostel Manager' },
+      { id: 'reb_seed_005', studentId: 'demo_009', studentName: 'Faisal Dar',    rollNumber: 'ME2021034', days: 14, status: 'rejected',  requestedAt: d(10), reviewedAt: reviewed(8), reviewedBy: 'Hostel Manager' },
+      { id: 'reb_seed_006', studentId: 'demo_007', studentName: 'Tariq Shah',    rollNumber: 'PH2019034', days: 28, status: 'pending',   requestedAt: d(0, 3) },
+      { id: 'reb_seed_007', studentId: 'demo_017', studentName: 'Junaid Mir',    rollNumber: 'EN2020067', days: 10, status: 'cancelled', requestedAt: d(12), reviewedAt: reviewed(12) },
+      { id: 'reb_seed_008', studentId: 'demo_008', studentName: 'Ruqaiya Ganie', rollNumber: 'BT2023056', days: 14, status: 'approved',  requestedAt: d(15), reviewedAt: reviewed(13), reviewedBy: 'Hostel Manager' },
     ];
   }
 
