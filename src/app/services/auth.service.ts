@@ -1,0 +1,47 @@
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable, tap } from 'rxjs';
+
+const API = 'http://localhost:3000/api';
+const TOKEN_KEY = 'resideease_token';
+const USER_KEY  = 'resideease_user';
+
+@Injectable({ providedIn: 'root' })
+export class AuthService {
+  constructor(private readonly http: HttpClient) {}
+
+  loginManager(username: string, password: string): Observable<{ success: boolean; data: { token: string; user: any } }> {
+    return this.http.post<any>(`${API}/auth/login`, { username, password }).pipe(
+      tap(res => { if (res.success) this.saveSession(res.data.token, res.data.user); })
+    );
+  }
+
+  loginStudent(rollNumber: string, phone: string): Observable<{ success: boolean; data: { token: string; user: any } }> {
+    return this.http.post<any>(`${API}/auth/student/login`, { rollNumber, phone }).pipe(
+      tap(res => { if (res.success) this.saveSession(res.data.token, res.data.user); })
+    );
+  }
+
+  saveSession(token: string, user: any): void {
+    localStorage.setItem(TOKEN_KEY, token);
+    localStorage.setItem(USER_KEY, JSON.stringify(user));
+  }
+
+  getToken(): string | null {
+    return localStorage.getItem(TOKEN_KEY);
+  }
+
+  getUser(): any {
+    const raw = localStorage.getItem(USER_KEY);
+    return raw ? JSON.parse(raw) : null;
+  }
+
+  clearSession(): void {
+    localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(USER_KEY);
+  }
+
+  isLoggedIn(): boolean {
+    return !!this.getToken();
+  }
+}

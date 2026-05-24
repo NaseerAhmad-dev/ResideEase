@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-manager-login',
@@ -17,10 +18,12 @@ export class ManagerLoginComponent {
   });
 
   errorMessage = '';
+  loading = false;
 
   constructor(
     private readonly fb: FormBuilder,
-    private readonly router: Router
+    private readonly router: Router,
+    private readonly authService: AuthService,
   ) {}
 
   login(): void {
@@ -32,12 +35,17 @@ export class ManagerLoginComponent {
     }
 
     const { username, password } = this.loginForm.value;
+    this.loading = true;
 
-    // Dummy credentials for demo
-    if (username === 'manager' && password === 'manager123') {
-      this.router.navigate(['/manager/dashboard']);
-    } else {
-      this.errorMessage = 'Invalid credentials. Please try again.';
-    }
+    this.authService.loginManager(username!, password!).subscribe({
+      next: () => {
+        this.loading = false;
+        this.router.navigate(['/manager/dashboard']);
+      },
+      error: (err) => {
+        this.loading = false;
+        this.errorMessage = err.error?.message ?? 'Login failed. Please try again.';
+      },
+    });
   }
 }

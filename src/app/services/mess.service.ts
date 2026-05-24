@@ -184,6 +184,15 @@ export class MessService {
     });
   }
 
+  addAuditPublishedNotification(monthLabel: string, year: number, totalBill: number, perDay: number, studentCount: number): void {
+    this.addNotification({
+      type: 'audit',
+      title: `Billing Audit Published — ${monthLabel} ${year}`,
+      message: `${studentCount} students billed · Total: INR ${totalBill.toLocaleString('en-IN', { maximumFractionDigits: 0 })} · Per day: INR ${perDay.toFixed(2)}`,
+      priority: 'high'
+    });
+  }
+
   private generateId(): string {
     return 'mess_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
   }

@@ -106,17 +106,21 @@
       <option value="low">Low</option>
     </select>
 
-    <button class="btn-clear" type="button" *ngIf="hasActiveFilters" (click)="clearFilters()">
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-           stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-      </svg>
-      Clear
-    </button>
+    @if (hasActiveFilters) {
+      <button class="btn-clear" type="button" (click)="clearFilters()">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+        Clear
+      </button>
+    }
 
-    <span class="results-count" *ngIf="hasActiveFilters">
-      {{ filteredRequests.length }} of {{ allRequests.length }} tickets
-    </span>
+    @if (hasActiveFilters) {
+      <span class="results-count">
+        {{ filteredRequests.length }} of {{ allRequests.length }} tickets
+      </span>
+    }
   </div>
 
   <!-- ── Table ── -->
@@ -142,62 +146,65 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let r of filteredRequests"
-            [class.row-resolved]="r.status === 'resolved' || r.status === 'closed'">
+        @for (r of filteredRequests; track r.id) {
+          <tr [class.row-resolved]="r.status === 'resolved' || r.status === 'closed'">
 
-          <td><code class="ticket-code">{{ r.ticketNumber }}</code></td>
+            <td><code class="ticket-code">{{ r.ticketNumber }}</code></td>
 
-          <td>
-            <div class="student-cell">
-              <div class="avatar-sm" [style.background-color]="getAvatarColor(r.studentName)">
-                {{ initials(r.studentName) }}
+            <td>
+              <div class="student-cell">
+                <div class="avatar-sm" [style.background-color]="getAvatarColor(r.studentName)">
+                  {{ initials(r.studentName) }}
+                </div>
+                <div>
+                  <div class="student-name">{{ r.studentName }}</div>
+                  <div class="student-roll">{{ r.rollNumber }}</div>
+                </div>
               </div>
-              <div>
-                <div class="student-name">{{ r.studentName }}</div>
-                <div class="student-roll">{{ r.rollNumber }}</div>
-              </div>
-            </div>
-          </td>
+            </td>
 
-          <td><span class="room-pill">{{ r.roomNumber }}</span></td>
+            <td><span class="room-pill">{{ r.roomNumber }}</span></td>
 
-          <td><span class="category-tag category-tag--{{ r.category }}">{{ categoryLabel(r.category) }}</span></td>
+            <td><span class="category-tag category-tag--{{ r.category }}">{{ categoryLabel(r.category) }}</span></td>
 
-          <td class="issue-col">
-            <p class="issue-title">{{ r.title }}</p>
-            <p class="issue-desc">{{ r.description }}</p>
-          </td>
+            <td class="issue-col">
+              <p class="issue-title">{{ r.title }}</p>
+              <p class="issue-desc">{{ r.description }}</p>
+            </td>
 
-          <td><span class="priority-chip priority-chip--{{ r.priority }}">{{ r.priority | titlecase }}</span></td>
+            <td><span class="priority-chip priority-chip--{{ r.priority }}">{{ r.priority | titlecase }}</span></td>
 
-          <td><span class="status-chip status-chip--{{ r.status }}">{{ r.status | titlecase }}</span></td>
+            <td><span class="status-chip status-chip--{{ r.status }}">{{ r.status | titlecase }}</span></td>
 
-          <td class="date-col">{{ r.raisedAt | date:'d MMM yyyy' }}</td>
+            <td class="date-col">{{ r.raisedAt | date:'d MMM yyyy' }}</td>
 
-          <td>
-            <select class="action-select" [value]="r.status"
-                    (change)="updateStatus(r.id, $any($event.target).value)"
-                    [disabled]="r.status === 'closed'">
-              <option value="open">Open</option>
-              <option value="in-progress">In Progress</option>
-              <option value="resolved">Resolved</option>
-              <option value="closed">Closed</option>
-            </select>
-          </td>
+            <td>
+              <select class="action-select" [value]="r.status"
+                      (change)="updateStatus(r.id, $any($event.target).value)"
+                      [disabled]="r.status === 'closed'">
+                <option value="open">Open</option>
+                <option value="in-progress">In Progress</option>
+                <option value="resolved">Resolved</option>
+                <option value="closed">Closed</option>
+              </select>
+            </td>
 
-        </tr>
+          </tr>
+        }
       </tbody>
     </table>
 
     <!-- Empty state -->
-    <div class="empty-state" *ngIf="filteredRequests.length === 0">
-      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-           stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
-      </svg>
-      <p>No maintenance tickets match your filters.</p>
-      <button class="btn-clear-empty" type="button" (click)="clearFilters()">Clear filters</button>
-    </div>
+    @if (filteredRequests.length === 0) {
+      <div class="empty-state">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+        </svg>
+        <p>No maintenance tickets match your filters.</p>
+        <button class="btn-clear-empty" type="button" (click)="clearFilters()">Clear filters</button>
+      </div>
+    }
   </div>
 
 </div>

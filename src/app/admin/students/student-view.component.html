@@ -1,16 +1,18 @@
 <!-- Not Found -->
-<div *ngIf="notFound" class="not-found">
-  <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24"
-       fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-    <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/>
-    <line x1="12" y1="16" x2="12.01" y2="16"/>
-  </svg>
-  <h3>Student not found</h3>
-  <p>The student record you're looking for doesn't exist.</p>
-  <button class="btn-back" (click)="goBack()">Back to Students</button>
-</div>
+@if (notFound) {
+  <div class="not-found">
+    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24"
+         fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/>
+      <line x1="12" y1="16" x2="12.01" y2="16"/>
+    </svg>
+    <h3>Student not found</h3>
+    <p>The student record you're looking for doesn't exist.</p>
+    <button class="btn-back" (click)="goBack()">Back to Students</button>
+  </div>
+}
 
-<ng-container *ngIf="student">
+@if (student) {
 
   <!-- Top bar -->
   <div class="view-topbar">
@@ -136,7 +138,9 @@
             <dt>Residence Expiry</dt>
             <dd [class.text-danger]="student.status === 'expired'">
               {{ student.residenceExpiry | date:'d MMMM yyyy' }}
-              <span *ngIf="student.status === 'expired'" class="expired-badge">Expired</span>
+              @if (student.status === 'expired') {
+                <span class="expired-badge">Expired</span>
+              }
             </dd>
           </div>
           <div class="info-row">
@@ -237,4 +241,4 @@
 
   </p-tabView>
 
-</ng-container>
+}

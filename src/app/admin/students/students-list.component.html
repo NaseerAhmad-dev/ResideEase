@@ -58,15 +58,17 @@
   </div>
 
   <!-- Bulk Bar -->
-  <div class="bulk-bar" *ngIf="selectedStudents.length > 0">
-    <span class="bulk-info">
-      <i class="pi pi-check-circle"></i>
-      {{ selectedStudents.length }} student{{ selectedStudents.length !== 1 ? 's' : '' }} selected
-    </span>
-    <button class="btn-danger-outline" (click)="deleteSelected()">
-      <i class="pi pi-trash"></i> Delete Selected
-    </button>
-  </div>
+  @if (selectedStudents.length > 0) {
+    <div class="bulk-bar">
+      <span class="bulk-info">
+        <i class="pi pi-check-circle"></i>
+        {{ selectedStudents.length }} student{{ selectedStudents.length !== 1 ? 's' : '' }} selected
+      </span>
+      <button class="btn-danger-outline" (click)="deleteSelected()">
+        <i class="pi pi-trash"></i> Delete Selected
+      </button>
+    </div>
+  }
 
   <!-- Table -->
   <p-table

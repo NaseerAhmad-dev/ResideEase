@@ -103,6 +103,10 @@ export const routes: Routes = [
           {
             path: 'settings',
             loadComponent: () => import('./manager/settings/manager-settings.component').then(m => m.ManagerSettingsComponent)
+          },
+          {
+            path: 'audit',
+            loadComponent: () => import('./manager/audit/manager-audit.component').then(m => m.ManagerAuditComponent)
           }
         ]
       }

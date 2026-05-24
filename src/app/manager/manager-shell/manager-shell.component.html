@@ -11,12 +11,16 @@
           <path d="M14 5L5 11v12h6v-7h6v7h6V11L14 5z" fill="white"/>
         </svg>
       </div>
-      <span class="brand-name" *ngIf="sidebarOpen()">ResideEase</span>
+      @if (sidebarOpen()) {
+        <span class="brand-name">ResideEase</span>
+      }
     </div>
 
     <!-- Primary nav -->
     <nav class="sidebar-nav">
-      <div class="nav-label" *ngIf="sidebarOpen()">Main menu</div>
+      @if (sidebarOpen()) {
+        <div class="nav-label">Main menu</div>
+      }
       @for (item of navItems; track item.route) {
         <a class="nav-item"
            [routerLink]="item.route"
@@ -24,16 +28,33 @@
            [attr.title]="!sidebarOpen() ? item.label : null"
            [attr.aria-label]="item.label">
           <span class="nav-icon" aria-hidden="true">
-            <ng-container [ngSwitch]="item.icon">
-              <svg *ngSwitchCase="'grid'"   width="18" height="18" viewBox="0 0 20 20" fill="none"><rect x="2" y="2" width="7" height="7" rx="1.5" fill="currentColor"/><rect x="11" y="2" width="7" height="7" rx="1.5" fill="currentColor"/><rect x="2" y="11" width="7" height="7" rx="1.5" fill="currentColor"/><rect x="11" y="11" width="7" height="7" rx="1.5" fill="currentColor"/></svg>
-              <svg *ngSwitchCase="'fork'"   width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M6 2v4a2 2 0 002 2h4a2 2 0 002-2V2M10 8v10M6 2v4M14 2v4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-              <svg *ngSwitchCase="'rebate'" width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M4 10a6 6 0 106-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M4 6v4h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              <svg *ngSwitchCase="'bill'"   width="18" height="18" viewBox="0 0 20 20" fill="none"><rect x="3" y="2" width="14" height="16" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M7 7h6M7 10h6M7 13h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-              <svg *ngSwitchCase="'bell'"   width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M10 2a6 6 0 00-6 6v3l-2 2v1h16v-1l-2-2V8a6 6 0 00-6-6zm0 16a2 2 0 01-2-2h4a2 2 0 01-2 2z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
-              <svg *ngSwitchCase="'gear'"   width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M10 13a3 3 0 100-6 3 3 0 000 6z" stroke="currentColor" stroke-width="1.5"/><path d="M17.7 10.9l-1.4-.8a6 6 0 000-2.2l1.4-.8a1 1 0 00.4-1.3l-1-1.7a1 1 0 00-1.3-.4l-1.4.8a6 6 0 00-1.9-1.1V1.7A1 1 0 0011.5 1h-3a1 1 0 00-1 1v1.4A6 6 0 005.6 4.5l-1.4-.8a1 1 0 00-1.3.4l-1 1.7a1 1 0 00.4 1.3l1.4.8a6 6 0 000 2.2l-1.4.8a1 1 0 00-.4 1.3l1 1.7a1 1 0 001.3.4l1.4-.8a6 6 0 001.9 1.1v1.4a1 1 0 001 1h3a1 1 0 001-1v-1.4a6 6 0 001.9-1.1l1.4.8a1 1 0 001.3-.4l1-1.7a1 1 0 00-.4-1.3z" stroke="currentColor" stroke-width="1.3"/></svg>
-            </ng-container>
+            @switch (item.icon) {
+              @case ('grid') {
+                <svg width="18" height="18" viewBox="0 0 20 20" fill="none"><rect x="2" y="2" width="7" height="7" rx="1.5" fill="currentColor"/><rect x="11" y="2" width="7" height="7" rx="1.5" fill="currentColor"/><rect x="2" y="11" width="7" height="7" rx="1.5" fill="currentColor"/><rect x="11" y="11" width="7" height="7" rx="1.5" fill="currentColor"/></svg>
+              }
+              @case ('fork') {
+                <svg width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M6 2v4a2 2 0 002 2h4a2 2 0 002-2V2M10 8v10M6 2v4M14 2v4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+              }
+              @case ('rebate') {
+                <svg width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M4 10a6 6 0 106-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M4 6v4h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              }
+              @case ('bill') {
+                <svg width="18" height="18" viewBox="0 0 20 20" fill="none"><rect x="3" y="2" width="14" height="16" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M7 7h6M7 10h6M7 13h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+              }
+              @case ('bell') {
+                <svg width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M10 2a6 6 0 00-6 6v3l-2 2v1h16v-1l-2-2V8a6 6 0 00-6-6zm0 16a2 2 0 01-2-2h4a2 2 0 01-2 2z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+              }
+              @case ('audit') {
+                <svg width="18" height="18" viewBox="0 0 20 20" fill="none"><rect x="3" y="2" width="14" height="16" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M7 6h6M7 9h6M7 12h3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="14.5" cy="14.5" r="2.5" stroke="currentColor" stroke-width="1.3"/><path d="M16.5 16.5l1.5 1.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+              }
+              @case ('gear') {
+                <svg width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M10 13a3 3 0 100-6 3 3 0 000 6z" stroke="currentColor" stroke-width="1.5"/><path d="M17.7 10.9l-1.4-.8a6 6 0 000-2.2l1.4-.8a1 1 0 00.4-1.3l-1-1.7a1 1 0 00-1.3-.4l-1.4.8a6 6 0 00-1.9-1.1V1.7A1 1 0 0011.5 1h-3a1 1 0 00-1 1v1.4A6 6 0 005.6 4.5l-1.4-.8a1 1 0 00-1.3.4l-1 1.7a1 1 0 00.4 1.3l1.4.8a6 6 0 000 2.2l-1.4.8a1 1 0 00-.4 1.3l1 1.7a1 1 0 001.3.4l1.4-.8a6 6 0 001.9 1.1v1.4a1 1 0 001 1h3a1 1 0 001-1v-1.4a6 6 0 001.9-1.1l1.4.8a1 1 0 001.3-.4l1-1.7a1 1 0 00-.4-1.3z" stroke="currentColor" stroke-width="1.3"/></svg>
+              }
+            }
           </span>
-          <span class="nav-label-text" *ngIf="sidebarOpen()">{{ item.label }}</span>
+          @if (sidebarOpen()) {
+            <span class="nav-label-text">{{ item.label }}</span>
+          }
           @if (item.badge && sidebarOpen()) {
             <span class="nav-badge">{{ item.badge }}</span>
           }
@@ -54,40 +75,50 @@
           <span class="nav-icon" aria-hidden="true">
             <svg width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M10 13a3 3 0 100-6 3 3 0 000 6z" stroke="currentColor" stroke-width="1.5"/><path d="M17.7 10.9l-1.4-.8a6 6 0 000-2.2l1.4-.8a1 1 0 00.4-1.3l-1-1.7a1 1 0 00-1.3-.4l-1.4.8a6 6 0 00-1.9-1.1V1.7A1 1 0 0011.5 1h-3a1 1 0 00-1 1v1.4A6 6 0 005.6 4.5l-1.4-.8a1 1 0 00-1.3.4l-1 1.7a1 1 0 00.4 1.3l1.4.8a6 6 0 000 2.2l-1.4.8a1 1 0 00-.4 1.3l1 1.7a1 1 0 001.3.4l1.4-.8a6 6 0 001.9 1.1v1.4a1 1 0 001 1h3a1 1 0 001-1v-1.4a6 6 0 001.9-1.1l1.4.8a1 1 0 001.3-.4l1-1.7a1 1 0 00-.4-1.3z" stroke="currentColor" stroke-width="1.3"/></svg>
           </span>
-          <span class="nav-label-text" *ngIf="sidebarOpen()">{{ item.label }}</span>
+          @if (sidebarOpen()) {
+            <span class="nav-label-text">{{ item.label }}</span>
+          }
         </a>
       }
 
       <!-- User -->
-      <div class="nav-user" *ngIf="sidebarOpen()">
-        <div class="user-avatar">M</div>
-        <div class="user-info">
-          <div class="user-name">Hostel Manager</div>
-          <div class="user-role">Maple Residency</div>
+      @if (sidebarOpen()) {
+        <div class="nav-user">
+          <div class="user-avatar">M</div>
+          <div class="user-info">
+            <div class="user-name">Hostel Manager</div>
+            <div class="user-role">Maple Residency</div>
+          </div>
         </div>
-      </div>
-      <div class="nav-user-mini" *ngIf="!sidebarOpen()">
-        <div class="user-avatar">M</div>
-      </div>
+      }
+      @if (!sidebarOpen()) {
+        <div class="nav-user-mini">
+          <div class="user-avatar">M</div>
+        </div>
+      }
 
       <!-- Sign out -->
-      <button class="btn-signout" *ngIf="sidebarOpen()" (click)="signOut()" type="button">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-          <polyline points="16 17 21 12 16 7"/>
-          <line x1="21" y1="12" x2="9" y2="12"/>
-        </svg>
-        Sign Out
-      </button>
-      <button class="btn-signout-mini" *ngIf="!sidebarOpen()" (click)="signOut()" type="button" title="Sign Out">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-          <polyline points="16 17 21 12 16 7"/>
-          <line x1="21" y1="12" x2="9" y2="12"/>
-        </svg>
-      </button>
+      @if (sidebarOpen()) {
+        <button class="btn-signout" (click)="signOut()" type="button">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+            <polyline points="16 17 21 12 16 7"/>
+            <line x1="21" y1="12" x2="9" y2="12"/>
+          </svg>
+          Sign Out
+        </button>
+      }
+      @if (!sidebarOpen()) {
+        <button class="btn-signout-mini" (click)="signOut()" type="button" title="Sign Out">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+            <polyline points="16 17 21 12 16 7"/>
+            <line x1="21" y1="12" x2="9" y2="12"/>
+          </svg>
+        </button>
+      }
     </div>
 
   </aside>
@@ -121,37 +152,51 @@
             <svg width="18" height="18" viewBox="0 0 20 20" fill="none" aria-hidden="true">
               <path d="M10 2a6 6 0 00-6 6v3l-2 2v1h16v-1l-2-2V8a6 6 0 00-6-6zm0 16a2 2 0 01-2-2h4a2 2 0 01-2 2z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
             </svg>
-            <span class="notif-dot" *ngIf="unreadCount > 0" [attr.aria-label]="unreadCount + ' unread notifications'"></span>
+            @if (unreadCount > 0) {
+              <span class="notif-dot" [attr.aria-label]="unreadCount + ' unread notifications'"></span>
+            }
           </button>
 
-          <dialog class="notif-dropdown" *ngIf="notifOpen()" open aria-label="Notifications">
-            <div class="dropdown-head">
-              <span class="dropdown-title">Notifications</span>
-              <span class="unread-pill" *ngIf="unreadCount > 0">{{ unreadCount }} new</span>
-            </div>
-
-            <div class="notif-list" *ngIf="recentNotifs.length > 0">
-              <div *ngFor="let n of recentNotifs" class="notif-row" [class.notif-row--unread]="!n.isRead">
-                <div class="notif-row-body">
-                  <div class="notif-row-title">{{ n.title }}</div>
-                  <div class="notif-row-msg">{{ n.message }}</div>
-                  <div class="notif-row-time">{{ timeAgo(n.createdAt) }}</div>
-                </div>
-                <button *ngIf="!n.isRead" class="notif-mark-btn" (click)="markRead(n.id)" type="button">Mark read</button>
+          @if (notifOpen()) {
+            <dialog class="notif-dropdown" open aria-label="Notifications">
+              <div class="dropdown-head">
+                <span class="dropdown-title">Notifications</span>
+                @if (unreadCount > 0) {
+                  <span class="unread-pill">{{ unreadCount }} new</span>
+                }
               </div>
-            </div>
 
-            <div class="notif-empty" *ngIf="recentNotifs.length === 0">
-              <svg width="28" height="28" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-                <path d="M10 2a6 6 0 00-6 6v3l-2 2v1h16v-1l-2-2V8a6 6 0 00-6-6zm0 16a2 2 0 01-2-2h4a2 2 0 01-2 2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/>
-              </svg>
-              <p>No notifications</p>
-            </div>
+              @if (recentNotifs.length > 0) {
+                <div class="notif-list">
+                  @for (n of recentNotifs; track n.id) {
+                    <div class="notif-row" [class.notif-row--unread]="!n.isRead">
+                      <div class="notif-row-body">
+                        <div class="notif-row-title">{{ n.title }}</div>
+                        <div class="notif-row-msg">{{ n.message }}</div>
+                        <div class="notif-row-time">{{ timeAgo(n.createdAt) }}</div>
+                      </div>
+                      @if (!n.isRead) {
+                        <button class="notif-mark-btn" (click)="markRead(n.id)" type="button">Mark read</button>
+                      }
+                    </div>
+                  }
+                </div>
+              }
 
-            <div class="dropdown-footer">
-              <a routerLink="/manager/notices" class="view-all-link" (click)="notifOpen.set(false)">View all notices</a>
-            </div>
-          </dialog>
+              @if (recentNotifs.length === 0) {
+                <div class="notif-empty">
+                  <svg width="28" height="28" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                    <path d="M10 2a6 6 0 00-6 6v3l-2 2v1h16v-1l-2-2V8a6 6 0 00-6-6zm0 16a2 2 0 01-2-2h4a2 2 0 01-2 2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/>
+                  </svg>
+                  <p>No notifications</p>
+                </div>
+              }
+
+              <div class="dropdown-footer">
+                <a routerLink="/manager/notices" class="view-all-link" (click)="notifOpen.set(false)">View all notices</a>
+              </div>
+            </dialog>
+          }
         </div>
 
         <!-- Profile avatar -->
@@ -159,25 +204,27 @@
           <button class="topbar-avatar" (click)="toggleProfile($event)"
             [attr.aria-expanded]="profileOpen()" aria-label="Manager profile" aria-haspopup="true">M</button>
 
-          <dialog class="profile-dropdown" *ngIf="profileOpen()" open aria-label="Profile menu">
-            <div class="profile-head">
-              <div class="profile-avatar">M</div>
-              <div class="profile-info">
-                <div class="profile-name">Hostel Manager</div>
-                <div class="profile-role">Maple Residency &nbsp;·&nbsp; Manager</div>
+          @if (profileOpen()) {
+            <dialog class="profile-dropdown" open aria-label="Profile menu">
+              <div class="profile-head">
+                <div class="profile-avatar">M</div>
+                <div class="profile-info">
+                  <div class="profile-name">Hostel Manager</div>
+                  <div class="profile-role">Maple Residency &nbsp;·&nbsp; Manager</div>
+                </div>
               </div>
-            </div>
-            <div class="dropdown-divider"></div>
-            <a routerLink="/manager/settings" class="dropdown-item" (click)="profileOpen.set(false)">
-              <svg width="15" height="15" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M10 13a3 3 0 100-6 3 3 0 000 6z" stroke="currentColor" stroke-width="1.5"/><path d="M17.7 10.9l-1.4-.8a6 6 0 000-2.2l1.4-.8a1 1 0 00.4-1.3l-1-1.7a1 1 0 00-1.3-.4l-1.4.8a6 6 0 00-1.9-1.1V1.7A1 1 0 0011.5 1h-3a1 1 0 00-1 1v1.4A6 6 0 005.6 4.5l-1.4-.8a1 1 0 00-1.3.4l-1 1.7a1 1 0 00.4 1.3l1.4.8a6 6 0 000 2.2l-1.4.8a1 1 0 00-.4 1.3l1 1.7a1 1 0 001.3.4l1.4-.8a6 6 0 001.9 1.1v1.4a1 1 0 001 1h3a1 1 0 001-1v-1.4a6 6 0 001.9-1.1l1.4.8a1 1 0 001.3-.4l1-1.7a1 1 0 00-.4-1.3z" stroke="currentColor" stroke-width="1.3"/></svg>
-              Settings
-            </a>
-            <div class="dropdown-divider"></div>
-            <button class="dropdown-item dropdown-item--danger" (click)="signOut()" type="button">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-              Sign out
-            </button>
-          </dialog>
+              <div class="dropdown-divider"></div>
+              <a routerLink="/manager/settings" class="dropdown-item" (click)="profileOpen.set(false)">
+                <svg width="15" height="15" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M10 13a3 3 0 100-6 3 3 0 000 6z" stroke="currentColor" stroke-width="1.5"/><path d="M17.7 10.9l-1.4-.8a6 6 0 000-2.2l1.4-.8a1 1 0 00.4-1.3l-1-1.7a1 1 0 00-1.3-.4l-1.4.8a6 6 0 00-1.9-1.1V1.7A1 1 0 0011.5 1h-3a1 1 0 00-1 1v1.4A6 6 0 005.6 4.5l-1.4-.8a1 1 0 00-1.3.4l-1 1.7a1 1 0 00.4 1.3l1.4.8a6 6 0 000 2.2l-1.4.8a1 1 0 00-.4 1.3l1 1.7a1 1 0 001.3.4l1.4-.8a6 6 0 001.9 1.1v1.4a1 1 0 001 1h3a1 1 0 001-1v-1.4a6 6 0 001.9-1.1l1.4.8a1 1 0 001.3-.4l1-1.7a1 1 0 00-.4-1.3z" stroke="currentColor" stroke-width="1.3"/></svg>
+                Settings
+              </a>
+              <div class="dropdown-divider"></div>
+              <button class="dropdown-item dropdown-item--danger" (click)="signOut()" type="button">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                Sign out
+              </button>
+            </dialog>
+          }
         </div>
 
       </div>

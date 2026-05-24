@@ -45,130 +45,142 @@
     </div>
 
     <!-- ── Admin panel ── -->
-    <div class="tab-panel" *ngIf="activeTab === 'admin'" role="tabpanel">
-      <div class="panel-info panel-info--brand">
-        <div class="panel-info-icon">
-          <svg width="22" height="22" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-            <rect x="2" y="2" width="7" height="7" rx="1.5" fill="currentColor" opacity="0.8"/>
-            <rect x="11" y="2" width="7" height="7" rx="1.5" fill="currentColor"/>
-            <rect x="2" y="11" width="7" height="7" rx="1.5" fill="currentColor"/>
-            <rect x="11" y="11" width="7" height="7" rx="1.5" fill="currentColor" opacity="0.8"/>
-          </svg>
+    @if (activeTab === 'admin') {
+      <div class="tab-panel" role="tabpanel">
+        <div class="panel-info panel-info--brand">
+          <div class="panel-info-icon">
+            <svg width="22" height="22" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+              <rect x="2" y="2" width="7" height="7" rx="1.5" fill="currentColor" opacity="0.8"/>
+              <rect x="11" y="2" width="7" height="7" rx="1.5" fill="currentColor"/>
+              <rect x="2" y="11" width="7" height="7" rx="1.5" fill="currentColor"/>
+              <rect x="11" y="11" width="7" height="7" rx="1.5" fill="currentColor" opacity="0.8"/>
+            </svg>
+          </div>
+          <div>
+            <div class="panel-info-title">Office / Admin access</div>
+            <div class="panel-info-sub">Manage students, rooms, mess, payments, maintenance requests and hostel settings.</div>
+          </div>
         </div>
-        <div>
-          <div class="panel-info-title">Office / Admin access</div>
-          <div class="panel-info-sub">Manage students, rooms, mess, payments, maintenance requests and hostel settings.</div>
+
+        <form [formGroup]="adminForm" (ngSubmit)="loginAdmin()" novalidate>
+          <div class="field-group">
+            <label for="adm-username">Username</label>
+            <input id="adm-username" type="text" formControlName="username" placeholder="Enter username" autocomplete="username"/>
+          </div>
+          <div class="field-group">
+            <label for="adm-password">Password</label>
+            <input id="adm-password" type="password" formControlName="password" placeholder="Enter password" autocomplete="current-password"/>
+          </div>
+          @if (adminError) {
+            <div class="error-msg">
+              <svg width="13" height="13" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"/><path d="M10 6v4M10 13v1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+              {{ adminError }}
+            </div>
+          }
+          <button class="btn-primary" type="submit">
+            Sign in to Office
+            <svg width="14" height="14" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+              <path d="M4 10h12M10 4l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </form>
+
+        <div class="demo-hint">
+          <svg width="13" height="13" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"/><path d="M10 9v5M10 6v1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          Demo credentials &mdash; username: <strong>admin</strong> &nbsp; password: <strong>admin123</strong>
         </div>
       </div>
-
-      <form [formGroup]="adminForm" (ngSubmit)="loginAdmin()" novalidate>
-        <div class="field-group">
-          <label for="adm-username">Username</label>
-          <input id="adm-username" type="text" formControlName="username" placeholder="Enter username" autocomplete="username"/>
-        </div>
-        <div class="field-group">
-          <label for="adm-password">Password</label>
-          <input id="adm-password" type="password" formControlName="password" placeholder="Enter password" autocomplete="current-password"/>
-        </div>
-        <div class="error-msg" *ngIf="adminError">
-          <svg width="13" height="13" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"/><path d="M10 6v4M10 13v1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-          {{ adminError }}
-        </div>
-        <button class="btn-primary" type="submit">
-          Sign in to Office
-          <svg width="14" height="14" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-            <path d="M4 10h12M10 4l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </button>
-      </form>
-
-      <div class="demo-hint">
-        <svg width="13" height="13" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"/><path d="M10 9v5M10 6v1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-        Demo credentials &mdash; username: <strong>admin</strong> &nbsp; password: <strong>admin123</strong>
-      </div>
-    </div>
+    }
 
     <!-- ── Manager panel ── -->
-    <div class="tab-panel" *ngIf="activeTab === 'manager'" role="tabpanel">
-      <div class="panel-info panel-info--amber">
-        <div class="panel-info-icon">
-          <svg width="22" height="22" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-            <path d="M10 10a3 3 0 100-6 3 3 0 000 6zm-6 8a6 6 0 0112 0H4z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-          </svg>
+    @if (activeTab === 'manager') {
+      <div class="tab-panel" role="tabpanel">
+        <div class="panel-info panel-info--amber">
+          <div class="panel-info-icon">
+            <svg width="22" height="22" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+              <path d="M10 10a3 3 0 100-6 3 3 0 000 6zm-6 8a6 6 0 0112 0H4z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div>
+            <div class="panel-info-title">Manager access</div>
+            <div class="panel-info-sub">Verify mess coupons, view today's enrollment and manage meal distribution.</div>
+          </div>
         </div>
-        <div>
-          <div class="panel-info-title">Manager access</div>
-          <div class="panel-info-sub">Verify mess coupons, view today's enrollment and manage meal distribution.</div>
+
+        <form [formGroup]="managerForm" (ngSubmit)="loginManager()" novalidate>
+          <div class="field-group">
+            <label for="mgr-username">Username</label>
+            <input id="mgr-username" type="text" formControlName="username" placeholder="Enter username" autocomplete="username"/>
+          </div>
+          <div class="field-group">
+            <label for="mgr-password">Password</label>
+            <input id="mgr-password" type="password" formControlName="password" placeholder="Enter password" autocomplete="current-password"/>
+          </div>
+          @if (managerError) {
+            <div class="error-msg">
+              <svg width="13" height="13" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"/><path d="M10 6v4M10 13v1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+              {{ managerError }}
+            </div>
+          }
+          <button class="btn-primary" type="submit">
+            Sign in as Manager
+            <svg width="14" height="14" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+              <path d="M4 10h12M10 4l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </form>
+
+        <div class="demo-hint">
+          <svg width="13" height="13" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"/><path d="M10 9v5M10 6v1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          Demo credentials &mdash; username: <strong>manager</strong> &nbsp; password: <strong>manager123</strong>
         </div>
       </div>
-
-      <form [formGroup]="managerForm" (ngSubmit)="loginManager()" novalidate>
-        <div class="field-group">
-          <label for="mgr-username">Username</label>
-          <input id="mgr-username" type="text" formControlName="username" placeholder="Enter username" autocomplete="username"/>
-        </div>
-        <div class="field-group">
-          <label for="mgr-password">Password</label>
-          <input id="mgr-password" type="password" formControlName="password" placeholder="Enter password" autocomplete="current-password"/>
-        </div>
-        <div class="error-msg" *ngIf="managerError">
-          <svg width="13" height="13" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"/><path d="M10 6v4M10 13v1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-          {{ managerError }}
-        </div>
-        <button class="btn-primary" type="submit">
-          Sign in as Manager
-          <svg width="14" height="14" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-            <path d="M4 10h12M10 4l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </button>
-      </form>
-
-      <div class="demo-hint">
-        <svg width="13" height="13" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"/><path d="M10 9v5M10 6v1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-        Demo credentials &mdash; username: <strong>manager</strong> &nbsp; password: <strong>manager123</strong>
-      </div>
-    </div>
+    }
 
     <!-- ── Student panel ── -->
-    <div class="tab-panel" *ngIf="activeTab === 'student'" role="tabpanel">
-      <div class="panel-info panel-info--green">
-        <div class="panel-info-icon">
-          <svg width="22" height="22" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-            <path d="M10 2L2 7l8 5 8-5-8-5zM2 13l8 5 8-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
+    @if (activeTab === 'student') {
+      <div class="tab-panel" role="tabpanel">
+        <div class="panel-info panel-info--green">
+          <div class="panel-info-icon">
+            <svg width="22" height="22" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+              <path d="M10 2L2 7l8 5 8-5-8-5zM2 13l8 5 8-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div>
+            <div class="panel-info-title">Student access</div>
+            <div class="panel-info-sub">View your profile, hostel details, fee status and enroll for mess using your roll number and phone.</div>
+          </div>
         </div>
-        <div>
-          <div class="panel-info-title">Student access</div>
-          <div class="panel-info-sub">View your profile, hostel details, fee status and enroll for mess using your roll number and phone.</div>
+
+        <form [formGroup]="studentForm" (ngSubmit)="loginStudent()" novalidate>
+          <div class="field-group">
+            <label for="stu-roll">Roll number</label>
+            <input id="stu-roll" type="text" formControlName="rollNumber" placeholder="e.g. STU12345" autocomplete="username"/>
+          </div>
+          <div class="field-group">
+            <label for="stu-phone">Phone number</label>
+            <input id="stu-phone" type="tel" formControlName="phone" placeholder="e.g. 9876543210" autocomplete="tel"/>
+          </div>
+          @if (studentError) {
+            <div class="error-msg">
+              <svg width="13" height="13" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"/><path d="M10 6v4M10 13v1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+              {{ studentError }}
+            </div>
+          }
+          <button class="btn-primary btn-primary--green" type="submit">
+            View my dashboard
+            <svg width="14" height="14" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+              <path d="M4 10h12M10 4l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </form>
+
+        <div class="demo-hint">
+          <svg width="13" height="13" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"/><path d="M10 9v5M10 6v1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          Student accounts are created by the admin. Add a student first from the Admin panel.
         </div>
       </div>
-
-      <form [formGroup]="studentForm" (ngSubmit)="loginStudent()" novalidate>
-        <div class="field-group">
-          <label for="stu-roll">Roll number</label>
-          <input id="stu-roll" type="text" formControlName="rollNumber" placeholder="e.g. STU12345" autocomplete="username"/>
-        </div>
-        <div class="field-group">
-          <label for="stu-phone">Phone number</label>
-          <input id="stu-phone" type="tel" formControlName="phone" placeholder="e.g. 9876543210" autocomplete="tel"/>
-        </div>
-        <div class="error-msg" *ngIf="studentError">
-          <svg width="13" height="13" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"/><path d="M10 6v4M10 13v1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-          {{ studentError }}
-        </div>
-        <button class="btn-primary btn-primary--green" type="submit">
-          View my dashboard
-          <svg width="14" height="14" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-            <path d="M4 10h12M10 4l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </button>
-      </form>
-
-      <div class="demo-hint">
-        <svg width="13" height="13" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"/><path d="M10 9v5M10 6v1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-        Student accounts are created by the admin. Add a student first from the Admin panel.
-      </div>
-    </div>
+    }
 
   </div>
 

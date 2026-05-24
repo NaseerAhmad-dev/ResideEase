@@ -173,7 +173,9 @@
             </div>
             <div class="occ-label-row">
               <span class="occ-pct-label">{{ r.pct }}% occupied</span>
-              <span class="occ-vacant" *ngIf="r.total - r.occupied > 0">{{ r.total - r.occupied }} vacant</span>
+              @if (r.total - r.occupied > 0) {
+                <span class="occ-vacant">{{ r.total - r.occupied }} vacant</span>
+              }
             </div>
           </div>
         }

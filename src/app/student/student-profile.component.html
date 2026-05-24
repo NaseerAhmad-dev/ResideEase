@@ -1,5 +1,5 @@
 <div class="profile-page">
-  <div *ngIf="student; else notFound">
+  @if (student) {
 
     <!-- ── Topbar ── -->
     <header class="page-topbar">
@@ -94,400 +94,445 @@
             <path d="M7 10h6M10 7v6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
           </svg>
           Rebate
-          <span *ngIf="activeRebate" class="tab-dot"
-                [class.tab-dot--amber]="activeRebate.status === 'pending'"
-                [class.tab-dot--green]="activeRebate.status === 'approved'"></span>
+          @if (activeRebate) {
+            <span class="tab-dot"
+                  [class.tab-dot--amber]="activeRebate.status === 'pending'"
+                  [class.tab-dot--green]="activeRebate.status === 'approved'"></span>
+          }
         </button>
       </div>
 
       <!-- ── Basic Details ── -->
-      <div class="tab-card" *ngIf="activeTab === 'basic'" role="tabpanel">
-        <dl class="info-rows">
-          <div class="info-row">
-            <dt>Full Name</dt>
-            <dd>{{ student.firstName }} {{ student.lastName }}</dd>
-          </div>
-          <div class="info-row">
-            <dt>Roll Number</dt>
-            <dd class="mono">{{ student.rollNumber }}</dd>
-          </div>
-          <div class="info-row">
-            <dt>Email</dt>
-            <dd><a [href]="'mailto:' + student.email" class="link">{{ student.email }}</a></dd>
-          </div>
-          <div class="info-row">
-            <dt>Phone</dt>
-            <dd>{{ student.phone }}</dd>
-          </div>
-          <div class="info-row">
-            <dt>Gender</dt>
-            <dd>{{ student.gender | titlecase }}</dd>
-          </div>
-          <div class="info-row">
-            <dt>Account Status</dt>
-            <dd><span class="status-chip status-chip--{{ student.status }}">{{ student.status | titlecase }}</span></dd>
-          </div>
-        </dl>
-      </div>
+      @if (activeTab === 'basic') {
+        <div class="tab-card" role="tabpanel">
+          <dl class="info-rows">
+            <div class="info-row">
+              <dt>Full Name</dt>
+              <dd>{{ student.firstName }} {{ student.lastName }}</dd>
+            </div>
+            <div class="info-row">
+              <dt>Roll Number</dt>
+              <dd class="mono">{{ student.rollNumber }}</dd>
+            </div>
+            <div class="info-row">
+              <dt>Email</dt>
+              <dd><a [href]="'mailto:' + student.email" class="link">{{ student.email }}</a></dd>
+            </div>
+            <div class="info-row">
+              <dt>Phone</dt>
+              <dd>{{ student.phone }}</dd>
+            </div>
+            <div class="info-row">
+              <dt>Gender</dt>
+              <dd>{{ student.gender | titlecase }}</dd>
+            </div>
+            <div class="info-row">
+              <dt>Account Status</dt>
+              <dd><span class="status-chip status-chip--{{ student.status }}">{{ student.status | titlecase }}</span></dd>
+            </div>
+          </dl>
+        </div>
+      }
 
       <!-- ── Academic ── -->
-      <div class="tab-card" *ngIf="activeTab === 'education'" role="tabpanel">
-        <dl class="info-rows">
-          <div class="info-row">
-            <dt>Department</dt>
-            <dd>{{ student.department || '—' }}</dd>
-          </div>
-          <div class="info-row">
-            <dt>Current Semester</dt>
-            <dd>{{ student.currentSemester }}</dd>
-          </div>
-          <div class="info-row">
-            <dt>Residency Account</dt>
-            <dd>{{ student.residencyAccount | titlecase }}</dd>
-          </div>
-          <div class="info-row">
-            <dt>Member Since</dt>
-            <dd>{{ student.createdAt | date:'d MMMM yyyy' }}</dd>
-          </div>
-        </dl>
-      </div>
+      @if (activeTab === 'education') {
+        <div class="tab-card" role="tabpanel">
+          <dl class="info-rows">
+            <div class="info-row">
+              <dt>Department</dt>
+              <dd>{{ student.department || '—' }}</dd>
+            </div>
+            <div class="info-row">
+              <dt>Current Semester</dt>
+              <dd>{{ student.currentSemester }}</dd>
+            </div>
+            <div class="info-row">
+              <dt>Residency Account</dt>
+              <dd>{{ student.residencyAccount | titlecase }}</dd>
+            </div>
+            <div class="info-row">
+              <dt>Member Since</dt>
+              <dd>{{ student.createdAt | date:'d MMMM yyyy' }}</dd>
+            </div>
+          </dl>
+        </div>
+      }
 
       <!-- ── Room & Stay ── -->
-      <div class="tab-card" *ngIf="activeTab === 'hostel'" role="tabpanel">
-        <dl class="info-rows">
-          <div class="info-row">
-            <dt>Room Type</dt>
-            <dd><span class="room-chip">{{ student.selectedRoom }}</span></dd>
-          </div>
-          <div class="info-row">
-            <dt>Room Number</dt>
-            <dd>{{ student.roomNumber || '—' }}</dd>
-          </div>
-          <div class="info-row">
-            <dt>Check-in Date</dt>
-            <dd>{{ student.checkInDate | date:'d MMMM yyyy' }}</dd>
-          </div>
-          <div class="info-row">
-            <dt>Residence Expiry</dt>
-            <dd [class.text-danger]="student.status === 'expired'">
-              {{ student.residenceExpiry | date:'d MMMM yyyy' }}
-              <span *ngIf="student.status === 'expired'" class="expired-badge">Expired</span>
-            </dd>
-          </div>
-          <div class="info-row">
-            <dt>Residency Fee Paid</dt>
-            <dd>{{ residencyFeePaid }}</dd>
-          </div>
-          <div class="info-row">
-            <dt>Monthly Rent</dt>
-            <dd class="amount">₹{{ student.roomPrice | number }}<span class="per-mo">/mo</span></dd>
-          </div>
-        </dl>
-      </div>
+      @if (activeTab === 'hostel') {
+        <div class="tab-card" role="tabpanel">
+          <dl class="info-rows">
+            <div class="info-row">
+              <dt>Room Type</dt>
+              <dd><span class="room-chip">{{ student.selectedRoom }}</span></dd>
+            </div>
+            <div class="info-row">
+              <dt>Room Number</dt>
+              <dd>{{ student.roomNumber || '—' }}</dd>
+            </div>
+            <div class="info-row">
+              <dt>Check-in Date</dt>
+              <dd>{{ student.checkInDate | date:'d MMMM yyyy' }}</dd>
+            </div>
+            <div class="info-row">
+              <dt>Residence Expiry</dt>
+              <dd [class.text-danger]="student.status === 'expired'">
+                {{ student.residenceExpiry | date:'d MMMM yyyy' }}
+                @if (student.status === 'expired') {
+                  <span class="expired-badge">Expired</span>
+                }
+              </dd>
+            </div>
+            <div class="info-row">
+              <dt>Residency Fee Paid</dt>
+              <dd>{{ residencyFeePaid }}</dd>
+            </div>
+            <div class="info-row">
+              <dt>Monthly Rent</dt>
+              <dd class="amount">₹{{ student.roomPrice | number }}<span class="per-mo">/mo</span></dd>
+            </div>
+          </dl>
+        </div>
+      }
 
       <!-- ── Fee Summary ── -->
-      <div *ngIf="activeTab === 'fees'" role="tabpanel">
+      @if (activeTab === 'fees') {
+        <div role="tabpanel">
 
-        <!-- Status banner -->
-        <div class="fee-banner fee-banner--{{ feeStatus }}">
-          <div class="banner-icon">
-            <svg *ngIf="feeStatus === 'paid'" width="20" height="20" viewBox="0 0 20 20" fill="none">
-              <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"/>
-              <path d="M6.5 10l2.5 2.5 4.5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-            <svg *ngIf="feeStatus === 'pending'" width="20" height="20" viewBox="0 0 20 20" fill="none">
-              <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"/>
-              <path d="M10 6v4l2 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-            </svg>
-            <svg *ngIf="feeStatus === 'overdue'" width="20" height="20" viewBox="0 0 20 20" fill="none">
-              <path d="M10 2L2 17h16L10 2z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
-              <path d="M10 8v4M10 14v1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-            </svg>
-          </div>
-          <div class="banner-text">
-            <p class="banner-title">
-              <ng-container *ngIf="feeStatus === 'paid'">All fees cleared</ng-container>
-              <ng-container *ngIf="feeStatus === 'pending'">Payment pending</ng-container>
-              <ng-container *ngIf="feeStatus === 'overdue'">Payment overdue</ng-container>
-            </p>
-            <p class="banner-sub">
-              <ng-container *ngIf="feeStatus === 'paid'">Your account is up to date for this semester.</ng-container>
-              <ng-container *ngIf="feeStatus !== 'paid'">Please clear your dues at the hostel office or online portal.</ng-container>
-            </p>
-          </div>
-          <span class="pay-badge"
-                [class.pay-paid]="feeStatus === 'paid'"
-                [class.pay-pending]="feeStatus === 'pending'"
-                [class.pay-overdue]="feeStatus === 'overdue'">{{ feeStatusLabel }}</span>
-        </div>
-
-        <!-- Fee boxes -->
-        <div class="fee-grid">
-
-          <div class="fee-box">
-            <div class="fee-box-header">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                   stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-                <polyline points="9 22 9 12 15 12 15 22"/>
-              </svg>
-              Residency
+          <!-- Status banner -->
+          <div class="fee-banner fee-banner--{{ feeStatus }}">
+            <div class="banner-icon">
+              @if (feeStatus === 'paid') {
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                  <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"/>
+                  <path d="M6.5 10l2.5 2.5 4.5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              }
+              @if (feeStatus === 'pending') {
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                  <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"/>
+                  <path d="M10 6v4l2 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+              }
+              @if (feeStatus === 'overdue') {
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                  <path d="M10 2L2 17h16L10 2z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+                  <path d="M10 8v4M10 14v1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+              }
             </div>
-            <dl class="info-rows">
-              <div class="info-row">
-                <dt>Room Type</dt>
-                <dd><span class="room-chip">{{ student.selectedRoom }}</span></dd>
-              </div>
-              <div class="info-row">
-                <dt>Monthly Rent</dt>
-                <dd>₹{{ student.roomPrice | number }}</dd>
-              </div>
-              <div class="info-row">
-                <dt>Security Deposit</dt>
-                <dd>₹{{ student.securityDeposit | number }}</dd>
-              </div>
-              <div class="info-row">
-                <dt>Maintenance</dt>
-                <dd>₹{{ student.maintenanceCharge | number }}</dd>
-              </div>
-              <div class="info-row subtotal-row">
-                <dt>Residency Total</dt>
-                <dd>₹{{ (student.roomPrice + student.securityDeposit + student.maintenanceCharge) | number }}</dd>
-              </div>
-            </dl>
-          </div>
-
-          <div class="fee-box">
-            <div class="fee-box-header">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                   stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M18 8h1a4 4 0 0 1 0 8h-1"/>
-                <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/>
-                <line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/>
-              </svg>
-              Mess &amp; Payments
+            <div class="banner-text">
+              <p class="banner-title">
+                @if (feeStatus === 'paid') {
+                  All fees cleared
+                }
+                @if (feeStatus === 'pending') {
+                  Payment pending
+                }
+                @if (feeStatus === 'overdue') {
+                  Payment overdue
+                }
+              </p>
+              <p class="banner-sub">
+                @if (feeStatus === 'paid') {
+                  Your account is up to date for this semester.
+                }
+                @if (feeStatus !== 'paid') {
+                  Please clear your dues at the hostel office or online portal.
+                }
+              </p>
             </div>
-            <dl class="info-rows">
-              <div class="info-row">
-                <dt>Mess Fee</dt>
-                <dd>₹{{ student.messFee | number }}</dd>
+            <span class="pay-badge"
+                  [class.pay-paid]="feeStatus === 'paid'"
+                  [class.pay-pending]="feeStatus === 'pending'"
+                  [class.pay-overdue]="feeStatus === 'overdue'">{{ feeStatusLabel }}</span>
+          </div>
+
+          <!-- Fee boxes -->
+          <div class="fee-grid">
+
+            <div class="fee-box">
+              <div class="fee-box-header">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                  <polyline points="9 22 9 12 15 12 15 22"/>
+                </svg>
+                Residency
               </div>
-              <div class="info-row">
-                <dt>Amount Paid</dt>
-                <dd class="text-success">₹{{ student.paidAmount | number }}</dd>
+              <dl class="info-rows">
+                <div class="info-row">
+                  <dt>Room Type</dt>
+                  <dd><span class="room-chip">{{ student.selectedRoom }}</span></dd>
+                </div>
+                <div class="info-row">
+                  <dt>Monthly Rent</dt>
+                  <dd>₹{{ student.roomPrice | number }}</dd>
+                </div>
+                <div class="info-row">
+                  <dt>Security Deposit</dt>
+                  <dd>₹{{ student.securityDeposit | number }}</dd>
+                </div>
+                <div class="info-row">
+                  <dt>Maintenance</dt>
+                  <dd>₹{{ student.maintenanceCharge | number }}</dd>
+                </div>
+                <div class="info-row subtotal-row">
+                  <dt>Residency Total</dt>
+                  <dd>₹{{ (student.roomPrice + student.securityDeposit + student.maintenanceCharge) | number }}</dd>
+                </div>
+              </dl>
+            </div>
+
+            <div class="fee-box">
+              <div class="fee-box-header">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M18 8h1a4 4 0 0 1 0 8h-1"/>
+                  <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/>
+                  <line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/>
+                </svg>
+                Mess &amp; Payments
               </div>
-              <div class="info-row">
-                <dt>Balance Due</dt>
-                <dd [class.text-danger]="(student.totalPayment - student.paidAmount) > 0"
-                    [class.text-success]="(student.totalPayment - student.paidAmount) === 0">
-                  ₹{{ (student.totalPayment - student.paidAmount) | number }}
-                </dd>
-              </div>
-              <div class="info-row">
-                <dt>Last Payment</dt>
-                <dd>{{ student.lastPaymentDate ? (student.lastPaymentDate | date:'d MMM yyyy') : '—' }}</dd>
-              </div>
-              <div class="info-row subtotal-row">
-                <dt>Payment Status</dt>
-                <dd>
-                  <span class="pay-badge"
-                        [class.pay-paid]="student.paymentStatus === 'paid'"
-                        [class.pay-partial]="student.paymentStatus === 'partial'"
-                        [class.pay-overdue]="student.paymentStatus === 'overdue'">
-                    {{ student.paymentStatus | titlecase }}
-                  </span>
-                </dd>
-              </div>
-            </dl>
+              <dl class="info-rows">
+                <div class="info-row">
+                  <dt>Mess Fee</dt>
+                  <dd>₹{{ student.messFee | number }}</dd>
+                </div>
+                <div class="info-row">
+                  <dt>Amount Paid</dt>
+                  <dd class="text-success">₹{{ student.paidAmount | number }}</dd>
+                </div>
+                <div class="info-row">
+                  <dt>Balance Due</dt>
+                  <dd [class.text-danger]="(student.totalPayment - student.paidAmount) > 0"
+                      [class.text-success]="(student.totalPayment - student.paidAmount) === 0">
+                    ₹{{ (student.totalPayment - student.paidAmount) | number }}
+                  </dd>
+                </div>
+                <div class="info-row">
+                  <dt>Last Payment</dt>
+                  <dd>{{ student.lastPaymentDate ? (student.lastPaymentDate | date:'d MMM yyyy') : '—' }}</dd>
+                </div>
+                <div class="info-row subtotal-row">
+                  <dt>Payment Status</dt>
+                  <dd>
+                    <span class="pay-badge"
+                          [class.pay-paid]="student.paymentStatus === 'paid'"
+                          [class.pay-partial]="student.paymentStatus === 'partial'"
+                          [class.pay-overdue]="student.paymentStatus === 'overdue'">
+                      {{ student.paymentStatus | titlecase }}
+                    </span>
+                  </dd>
+                </div>
+              </dl>
+            </div>
+
+          </div>
+
+          <!-- Grand total -->
+          <div class="grand-total">
+            <span class="gt-label">Total Charges</span>
+            <span class="gt-amount">₹{{ student.totalPayment | number }}</span>
           </div>
 
         </div>
-
-        <!-- Grand total -->
-        <div class="grand-total">
-          <span class="gt-label">Total Charges</span>
-          <span class="gt-amount">₹{{ student.totalPayment | number }}</span>
-        </div>
-
-      </div>
+      }
 
       <!-- ── Mess ── -->
-      <div class="tab-card" *ngIf="activeTab === 'mess'" role="tabpanel">
+      @if (activeTab === 'mess') {
+        <div class="tab-card" role="tabpanel">
 
-        <div class="section-head">
-          <h3 class="section-title">Daily Mess Enrollment</h3>
-          <p class="section-sub">Enroll for today's lunch and dinner. One coupon covers both meals.</p>
-        </div>
-
-        <!-- Rebate block notice -->
-        <div class="alert-banner alert-banner--warning" *ngIf="hasApprovedRebate">
-          <div class="alert-icon">
-            <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
-              <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"/>
-              <path d="M10 7v3M10 13v.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-            </svg>
+          <div class="section-head">
+            <h3 class="section-title">Daily Mess Enrollment</h3>
+            <p class="section-sub">Enroll for today's lunch and dinner. One coupon covers both meals.</p>
           </div>
-          <div class="alert-body">
-            <p class="alert-title">Mess enrollment paused</p>
-            <p class="alert-desc">You have an approved rebate of <strong>{{ activeRebate?.days }} days</strong>. Cancel the rebate to generate a mess coupon.</p>
-          </div>
-          <button type="button" class="btn-outline" (click)="activeTab = 'rebate'">View rebate</button>
-        </div>
 
-        <!-- Not enrolled -->
-        <div class="enroll-empty" *ngIf="!todayEnrollment && !hasApprovedRebate">
-          <div class="enroll-empty-icon">
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                 stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M3 7h18l-1 10H4L3 7z"/>
-              <path d="M8 7V3a1 1 0 011-1h6a1 1 0 011 1v4"/>
-            </svg>
-          </div>
-          <h4>Not enrolled for today</h4>
-          <p>Click below to generate your mess coupon for today's meals.</p>
-          <button type="button" class="btn-primary" (click)="enrollForMess()">
-            <svg width="15" height="15" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-              <path d="M10 2a8 8 0 100 16A8 8 0 0010 2z" stroke="currentColor" stroke-width="1.5"/>
-              <path d="M7 10h6M10 7v6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-            </svg>
-            Enroll for Mess
-          </button>
-        </div>
+          <!-- Rebate block notice -->
+          @if (hasApprovedRebate) {
+            <div class="alert-banner alert-banner--warning">
+              <div class="alert-icon">
+                <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
+                  <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"/>
+                  <path d="M10 7v3M10 13v.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <div class="alert-body">
+                <p class="alert-title">Mess enrollment paused</p>
+                <p class="alert-desc">You have an approved rebate of <strong>{{ activeRebate?.days }} days</strong>. Cancel the rebate to generate a mess coupon.</p>
+              </div>
+              <button type="button" class="btn-outline" (click)="activeTab = 'rebate'">View rebate</button>
+            </div>
+          }
 
-        <!-- Coupon card -->
-        <div class="coupon-card" *ngIf="todayEnrollment">
-          <div class="coupon-card-head">
-            <div class="coupon-card-icon">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                   stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="2" y="4" width="20" height="16" rx="2"/>
-                <path d="M6 8h12M6 12h8M6 16h6"/>
+          <!-- Not enrolled -->
+          @if (!todayEnrollment && !hasApprovedRebate) {
+            <div class="enroll-empty">
+              <div class="enroll-empty-icon">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M3 7h18l-1 10H4L3 7z"/>
+                  <path d="M8 7V3a1 1 0 011-1h6a1 1 0 011 1v4"/>
+                </svg>
+              </div>
+              <h4>Not enrolled for today</h4>
+              <p>Click below to generate your mess coupon for today's meals.</p>
+              <button type="button" class="btn-primary" (click)="enrollForMess()">
+                <svg width="15" height="15" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                  <path d="M10 2a8 8 0 100 16A8 8 0 0010 2z" stroke="currentColor" stroke-width="1.5"/>
+                  <path d="M7 10h6M10 7v6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+                Enroll for Mess
+              </button>
+            </div>
+          }
+
+          <!-- Coupon card -->
+          @if (todayEnrollment) {
+            <div class="coupon-card">
+              <div class="coupon-card-head">
+                <div class="coupon-card-icon">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                       stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="2" y="4" width="20" height="16" rx="2"/>
+                    <path d="M6 8h12M6 12h8M6 16h6"/>
+                  </svg>
+                </div>
+                <div>
+                  <h4 class="coupon-card-title">Mess Coupon</h4>
+                  <p class="coupon-card-date">Valid for {{ todayEnrollment.enrollmentDate | date:'fullDate' }}</p>
+                </div>
+                <span class="status-chip"
+                      [class.status-chip--active]="todayEnrollment.status === 'enrolled'"
+                      [class.status-chip--served]="todayEnrollment.status === 'served'">
+                  {{ todayEnrollment.status === 'enrolled' ? 'Active' : todayEnrollment.status === 'served' ? 'Used' : 'Cancelled' }}
+                </span>
+              </div>
+
+              <div class="coupon-number-row">
+                <span class="coupon-label">Coupon Number</span>
+                <code class="coupon-value">{{ todayEnrollment.couponNumber }}</code>
+              </div>
+
+              <div class="coupon-note">
+                <svg width="14" height="14" viewBox="0 0 20 20" fill="none">
+                  <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"/>
+                  <path d="M10 7v3M10 13v.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+                @if (todayEnrollment.status === 'enrolled') {
+                  <span>Show this coupon to mess staff. Valid for both lunch and dinner today.</span>
+                }
+                @if (todayEnrollment.status === 'served') {
+                  <span>Meals served at {{ todayEnrollment.servedAt | date:'shortTime' }}.</span>
+                }
+              </div>
+            </div>
+          }
+
+          <!-- Success flash -->
+          @if (couponGenerated) {
+            <div class="alert-banner alert-banner--success">
+              <svg width="16" height="16" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"/>
+                <path d="M6.5 10l2.5 2.5 4.5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
               </svg>
+              Coupon generated successfully!
             </div>
-            <div>
-              <h4 class="coupon-card-title">Mess Coupon</h4>
-              <p class="coupon-card-date">Valid for {{ todayEnrollment.enrollmentDate | date:'fullDate' }}</p>
-            </div>
-            <span class="status-chip"
-                  [class.status-chip--active]="todayEnrollment.status === 'enrolled'"
-                  [class.status-chip--served]="todayEnrollment.status === 'served'">
-              {{ todayEnrollment.status === 'enrolled' ? 'Active' : todayEnrollment.status === 'served' ? 'Used' : 'Cancelled' }}
-            </span>
-          </div>
+          }
 
-          <div class="coupon-number-row">
-            <span class="coupon-label">Coupon Number</span>
-            <code class="coupon-value">{{ todayEnrollment.couponNumber }}</code>
-          </div>
-
-          <div class="coupon-note">
-            <svg width="14" height="14" viewBox="0 0 20 20" fill="none">
-              <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"/>
-              <path d="M10 7v3M10 13v.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-            </svg>
-            <span *ngIf="todayEnrollment.status === 'enrolled'">Show this coupon to mess staff. Valid for both lunch and dinner today.</span>
-            <span *ngIf="todayEnrollment.status === 'served'">Meals served at {{ todayEnrollment.servedAt | date:'shortTime' }}.</span>
-          </div>
         </div>
-
-        <!-- Success flash -->
-        <div class="alert-banner alert-banner--success" *ngIf="couponGenerated">
-          <svg width="16" height="16" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-            <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"/>
-            <path d="M6.5 10l2.5 2.5 4.5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-          Coupon generated successfully!
-        </div>
-
-      </div>
+      }
 
       <!-- ── Rebate ── -->
-      <div class="tab-card" *ngIf="activeTab === 'rebate'" role="tabpanel">
+      @if (activeTab === 'rebate') {
+        <div class="tab-card" role="tabpanel">
 
-        <div class="section-head">
-          <h3 class="section-title">Mess Rebate</h3>
-          <p class="section-sub">Request a temporary leave from the mess. During an approved rebate, coupon generation is paused.</p>
+          <div class="section-head">
+            <h3 class="section-title">Mess Rebate</h3>
+            <p class="section-sub">Request a temporary leave from the mess. During an approved rebate, coupon generation is paused.</p>
+          </div>
+
+          <!-- No active rebate -->
+          @if (!activeRebate) {
+            <p class="rebate-pick-label">Select rebate duration</p>
+            <div class="rebate-options">
+              @for (d of rebateDayOptions; track d) {
+                <button type="button" class="rebate-option"
+                        [class.rebate-option--selected]="selectedRebateDays === d"
+                        (click)="selectRebateDays(d)">
+                  <span class="rebate-days">{{ d }}</span>
+                  <span class="rebate-unit">days</span>
+                </button>
+              }
+            </div>
+            <div class="rebate-submit-row">
+              <button type="button" class="btn-primary" [disabled]="rebateSubmitting" (click)="submitRebate()">
+                <svg width="15" height="15" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                  <path d="M10 2a8 8 0 100 16A8 8 0 0010 2z" stroke="currentColor" stroke-width="1.5"/>
+                  <path d="M7 10h6M10 7v6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+                Request {{ selectedRebateDays }}-day rebate
+              </button>
+            </div>
+            @if (rebateSuccessMsg) {
+              <div class="alert-banner alert-banner--success">
+                <svg width="16" height="16" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                  <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"/>
+                  <path d="M6.5 10l2.5 2.5 4.5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                {{ rebateSuccessMsg }}
+              </div>
+            }
+          }
+
+          <!-- Pending -->
+          @if (activeRebate?.status === 'pending') {
+            <div class="rebate-status-card rebate-status-card--pending">
+              <div class="rsc-icon">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                  <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.8"/>
+                  <path d="M12 8v4l2 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <div class="rsc-body">
+                <p class="rsc-title">Rebate request pending</p>
+                <div class="rsc-meta">
+                  <span class="rebate-days-badge">{{ activeRebate?.days }} days</span>
+                  <span>Submitted {{ activeRebate?.requestedAt | date:'d MMM yyyy' }}</span>
+                </div>
+                <p class="rsc-desc">Your request is awaiting manager approval. You can still generate mess coupons until it is approved.</p>
+              </div>
+              <button type="button" class="btn-danger-outline" (click)="cancelRebate()">Cancel request</button>
+            </div>
+          }
+
+          <!-- Approved -->
+          @if (activeRebate?.status === 'approved') {
+            <div class="rebate-status-card rebate-status-card--approved">
+              <div class="rsc-icon">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                  <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.8"/>
+                  <path d="M8 12l2 2 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <div class="rsc-body">
+                <p class="rsc-title">Rebate approved</p>
+                <div class="rsc-meta">
+                  <span class="rebate-days-badge rebate-days-badge--green">{{ activeRebate?.days }} days</span>
+                  <span>Approved {{ activeRebate?.reviewedAt | date:'d MMM yyyy' }}</span>
+                </div>
+                <p class="rsc-desc">Mess enrollment is paused. Cancel this rebate if you want to generate mess coupons again.</p>
+              </div>
+              <button type="button" class="btn-danger-outline" (click)="cancelRebate()">Cancel rebate</button>
+            </div>
+          }
+
         </div>
-
-        <!-- No active rebate -->
-        <ng-container *ngIf="!activeRebate">
-          <p class="rebate-pick-label">Select rebate duration</p>
-          <div class="rebate-options">
-            <button *ngFor="let d of rebateDayOptions" type="button" class="rebate-option"
-                    [class.rebate-option--selected]="selectedRebateDays === d"
-                    (click)="selectRebateDays(d)">
-              <span class="rebate-days">{{ d }}</span>
-              <span class="rebate-unit">days</span>
-            </button>
-          </div>
-          <div class="rebate-submit-row">
-            <button type="button" class="btn-primary" [disabled]="rebateSubmitting" (click)="submitRebate()">
-              <svg width="15" height="15" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-                <path d="M10 2a8 8 0 100 16A8 8 0 0010 2z" stroke="currentColor" stroke-width="1.5"/>
-                <path d="M7 10h6M10 7v6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-              </svg>
-              Request {{ selectedRebateDays }}-day rebate
-            </button>
-          </div>
-          <div class="alert-banner alert-banner--success" *ngIf="rebateSuccessMsg">
-            <svg width="16" height="16" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-              <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"/>
-              <path d="M6.5 10l2.5 2.5 4.5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-            {{ rebateSuccessMsg }}
-          </div>
-        </ng-container>
-
-        <!-- Pending -->
-        <ng-container *ngIf="activeRebate?.status === 'pending'">
-          <div class="rebate-status-card rebate-status-card--pending">
-            <div class="rsc-icon">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.8"/>
-                <path d="M12 8v4l2 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-              </svg>
-            </div>
-            <div class="rsc-body">
-              <p class="rsc-title">Rebate request pending</p>
-              <div class="rsc-meta">
-                <span class="rebate-days-badge">{{ activeRebate?.days }} days</span>
-                <span>Submitted {{ activeRebate?.requestedAt | date:'d MMM yyyy' }}</span>
-              </div>
-              <p class="rsc-desc">Your request is awaiting manager approval. You can still generate mess coupons until it is approved.</p>
-            </div>
-            <button type="button" class="btn-danger-outline" (click)="cancelRebate()">Cancel request</button>
-          </div>
-        </ng-container>
-
-        <!-- Approved -->
-        <ng-container *ngIf="activeRebate?.status === 'approved'">
-          <div class="rebate-status-card rebate-status-card--approved">
-            <div class="rsc-icon">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.8"/>
-                <path d="M8 12l2 2 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </div>
-            <div class="rsc-body">
-              <p class="rsc-title">Rebate approved</p>
-              <div class="rsc-meta">
-                <span class="rebate-days-badge rebate-days-badge--green">{{ activeRebate?.days }} days</span>
-                <span>Approved {{ activeRebate?.reviewedAt | date:'d MMM yyyy' }}</span>
-              </div>
-              <p class="rsc-desc">Mess enrollment is paused. Cancel this rebate if you want to generate mess coupons again.</p>
-            </div>
-            <button type="button" class="btn-danger-outline" (click)="cancelRebate()">Cancel rebate</button>
-          </div>
-        </ng-container>
-
-      </div>
+      }
 
     </div><!-- /.profile-body -->
 
-  </div>
-
-  <!-- ── Not found ── -->
-  <ng-template #notFound>
+  } @else {
     <div class="not-found">
       <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor"
            stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
@@ -499,6 +544,6 @@
       <p>We could not find a matching student record. Please login again or contact the hostel office.</p>
       <a routerLink="/student/login" class="btn-primary">Return to login</a>
     </div>
-  </ng-template>
+  }
 
 </div>

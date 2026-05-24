@@ -36,6 +36,7 @@ export class ManagerShellComponent implements OnInit, OnDestroy {
     { label: 'Rebates',  route: '/manager/rebates',   icon: 'rebate' },
     { label: 'Bills',    route: '/manager/bills',     icon: 'bill'   },
     { label: 'Notices',  route: '/manager/notices',   icon: 'bell'   },
+    { label: 'Audit',    route: '/manager/audit',     icon: 'audit'  },
   ];
 
   bottomNav: NavItem[] = [
