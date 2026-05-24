@@ -208,3 +208,94 @@ app-root { display: block; min-height: 100vh; }
 }
 .confirm-text strong { color: var(--text-primary); font-weight: 600; }
 .confirm-text em     { font-style: normal; color: var(--c-danger); font-weight: 500; }
+
+/* ── Reusable Dropdown Panel (appendTo="body") ── */
+
+.re-dropdown-panel.p-dropdown-panel {
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  margin-top: 0.4rem;
+  overflow: hidden;
+  animation: re-dd-in 0.15s ease both;
+}
+
+@keyframes re-dd-in {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.re-dropdown-panel .p-dropdown-header {
+  padding: 0.5rem 0.5rem 0;
+  background: transparent;
+  border-bottom: none;
+}
+
+.re-dropdown-panel .p-dropdown-header .p-dropdown-filter-container {
+  position: relative;
+}
+
+.re-dropdown-panel .p-dropdown-header .p-dropdown-filter {
+  width: 100%;
+  font-size: 13px;
+  font-family: var(--font-sans);
+  border: 1.5px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px 8px 32px;
+  color: var(--text-primary);
+  background: var(--bg-input);
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.re-dropdown-panel .p-dropdown-header .p-dropdown-filter:focus {
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px rgba(10, 180, 168, 0.12);
+}
+
+.re-dropdown-panel .p-dropdown-header .p-dropdown-filter-icon {
+  color: var(--text-secondary);
+  left: 0.8rem;
+  right: auto;
+  font-size: 12px;
+}
+
+.re-dropdown-panel .p-dropdown-items-wrapper {
+  max-height: 22rem;
+}
+
+.re-dropdown-panel .p-dropdown-items {
+  padding: 0.4rem;
+  margin: 0;
+}
+
+.re-dropdown-panel .p-dropdown-item {
+  font-size: 14px;
+  font-family: var(--font-sans);
+  color: var(--text-primary);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  transition: background 0.15s, color 0.15s;
+  cursor: pointer;
+}
+
+.re-dropdown-panel .p-dropdown-item:not(.p-highlight):not(.p-disabled):hover {
+  background: var(--brand-light);
+  color: var(--brand-dark);
+}
+
+.re-dropdown-panel .p-dropdown-item.p-highlight {
+  background: var(--brand-light);
+  color: var(--brand);
+  font-weight: 600;
+}
+
+.re-dropdown-panel .p-dropdown-empty-message {
+  font-size: 13px;
+  font-family: var(--font-sans);
+  color: var(--text-muted);
+  font-style: italic;
+  padding: 10px 12px;
+  text-align: center;
+}

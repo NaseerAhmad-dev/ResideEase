@@ -12,36 +12,56 @@
   <div class="controls-card">
     <div class="controls-inner">
       <div class="control-group">
-        <label class="control-label" for="select-month">Month</label>
-        <select id="select-month" class="ctrl-select" [(ngModel)]="selectedMonth">
-          @for (mo of months; track mo.value) {
-            <option [value]="mo.value">{{ mo.label }}</option>
-          }
-        </select>
+        <app-dropdown
+          label="Month"
+          [options]="monthOptions"
+          placeholder="Select month"
+          [(ngModel)]="selectedMonth"
+          [showFilter]="false"
+          optionLabel="label"
+          optionValue="value"
+        ></app-dropdown>
       </div>
       <div class="control-group">
-        <label class="control-label" for="select-year">Year</label>
-        <select id="select-year" class="ctrl-select" [(ngModel)]="selectedYear">
-          @for (y of years; track y) {
-            <option [value]="y">{{ y }}</option>
-          }
-        </select>
+        <app-dropdown
+          label="Year"
+          [options]="yearOptions"
+          placeholder="Select year"
+          [(ngModel)]="selectedYear"
+          [showFilter]="false"
+          optionLabel="label"
+          optionValue="value"
+        ></app-dropdown>
       </div>
-      <button class="btn-run" (click)="runAudit()">
+      <button class="btn-run" [class.btn-rerun]="isAlreadyPublished" (click)="runAudit()">
         <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
           <path d="M4 10a6 6 0 106-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
           <path d="M4 6v4h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
-        Run Audit
+        {{ isAlreadyPublished ? 'Re-run Audit' : 'Run Audit' }}
       </button>
     </div>
-    @if (hasRun && result) {
-      <p class="audit-period-label">
-        Showing results for
-        <strong>{{ monthLabel }} {{ result.year }}</strong>
-        &nbsp;·&nbsp; {{ result.daysInMonth }} days
-      </p>
-    }
+
+    <div class="controls-meta">
+      @if (hasRun && result) {
+        <p class="audit-period-label">
+          Showing results for
+          <strong>{{ monthLabel }} {{ result.year }}</strong>
+          &nbsp;·&nbsp; {{ result.daysInMonth }} days
+        </p>
+      }
+      @if (isAlreadyPublished && publishedAudit) {
+        <div class="published-badge">
+          <svg width="13" height="13" viewBox="0 0 20 20" fill="none">
+            <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.8"/>
+            <path d="M6.5 10l2.5 2.5 4.5-4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Published on {{ publishedAudit.publishedAt | date:'d MMM yyyy, h:mm a' }}
+          &nbsp;·&nbsp;
+          <span class="rerun-hint">Re-running will overwrite the existing audit.</span>
+        </div>
+      }
+    </div>
   </div>
 
   @if (hasRun && result) {
@@ -120,8 +140,17 @@
     <!-- Results table -->
     <div class="table-card">
       <div class="table-head-row">
-        <h2 class="table-title">Student Breakdown</h2>
-        <span class="table-count">{{ result.rows.length }} student{{ result.rows.length !== 1 ? 's' : '' }}</span>
+        <div class="table-title-group">
+          <h2 class="table-title">Student Breakdown</h2>
+          <span class="table-count">{{ result.rows.length }} student{{ result.rows.length !== 1 ? 's' : '' }}</span>
+        </div>
+        <button class="btn-csv" (click)="exportCsv()">
+          <svg width="15" height="15" viewBox="0 0 20 20" fill="none">
+            <path d="M10 3v10M6 9l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M3 15h14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+          </svg>
+          Export CSV
+        </button>
       </div>
 
       <div class="table-scroll">
@@ -180,10 +209,38 @@
           </tfoot>
         </table>
       </div>
+
+      <!-- Publish bar -->
+      <div class="publish-bar">
+        @if (isAlreadyPublished) {
+          <div class="publish-bar__published">
+            <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
+              <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.6"/>
+              <path d="M6.5 10l2.5 2.5 4.5-4.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Audit already published for {{ monthLabel }} {{ result.year }}
+          </div>
+          <button class="btn-publish btn-publish--rerun" (click)="openConfirm()">
+            <svg width="15" height="15" viewBox="0 0 20 20" fill="none">
+              <path d="M4 10a6 6 0 106-6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+              <path d="M4 6v4h4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Re-publish &amp; Notify Again
+          </button>
+        } @else {
+          <p class="publish-bar__hint">
+            Publishing will notify all {{ result.studentCount }} students and send a summary to the office.
+          </p>
+          <button class="btn-publish" (click)="openConfirm()">
+            <svg width="15" height="15" viewBox="0 0 20 20" fill="none">
+              <path d="M3 10l7-7 7 7M10 3v14" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Publish Audit
+          </button>
+        }
+      </div>
     </div>
 
-  } @else if (hasRun && !result) {
-    <!-- shouldn't reach here, guard just in case -->
   } @else {
     <!-- Initial empty state -->
     <div class="empty-state">
@@ -199,3 +256,74 @@
   }
 
 </div>
+
+<!-- Confirmation dialog -->
+@if (showConfirm && result) {
+  <div class="overlay" (click)="cancelConfirm()">
+    <div class="confirm-dialog" (click)="$event.stopPropagation()">
+      <div class="confirm-header">
+        <div class="confirm-icon">
+          <svg width="22" height="22" viewBox="0 0 20 20" fill="none">
+            <path d="M3 10l7-7 7 7M10 3v14" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div>
+          <h3 class="confirm-title">Publish Billing Audit</h3>
+          <p class="confirm-subtitle">{{ monthLabel }} {{ result.year }}</p>
+        </div>
+      </div>
+
+      <div class="confirm-summary">
+        <div class="confirm-stat">
+          <span class="confirm-stat__label">Students to notify</span>
+          <span class="confirm-stat__value">{{ result.studentCount }}</span>
+        </div>
+        <div class="confirm-stat">
+          <span class="confirm-stat__label">Total supplier cost</span>
+          <span class="confirm-stat__value">INR {{ result.totalSupplierBill | number:'1.0-0' }}</span>
+        </div>
+        <div class="confirm-stat">
+          <span class="confirm-stat__label">Per-day rate</span>
+          <span class="confirm-stat__value">INR {{ result.perDayRate | number:'1.2-2' }}</span>
+        </div>
+        <div class="confirm-stat">
+          <span class="confirm-stat__label">Total billed</span>
+          <span class="confirm-stat__value">INR {{ result.totalStudentBill | number:'1.0-0' }}</span>
+        </div>
+      </div>
+
+      @if (isAlreadyPublished) {
+        <div class="confirm-warn">
+          <svg width="14" height="14" viewBox="0 0 20 20" fill="none">
+            <path d="M10 3L2 17h16L10 3z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+            <path d="M10 9v4M10 15v.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+          This will overwrite the existing published audit and re-notify all students.
+        </div>
+      }
+
+      <p class="confirm-note">This action cannot be undone. Each student will receive a bill notification in their account.</p>
+
+      <div class="confirm-actions">
+        <button class="btn-cancel" (click)="cancelConfirm()">Cancel</button>
+        <button class="btn-confirm" (click)="confirmPublish()">
+          <svg width="15" height="15" viewBox="0 0 20 20" fill="none">
+            <path d="M3 10l7-7 7 7M10 3v14" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          {{ isAlreadyPublished ? 'Re-publish' : 'Publish' }}
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Toast -->
+@if (toastMsg) {
+  <div class="toast" [class.toast-success]="toastType === 'success'" [class.toast-error]="toastType === 'error'">
+    <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
+      <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.6"/>
+      <path d="M6.5 10l2.5 2.5 4.5-4.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    {{ toastMsg }}
+  </div>
+}

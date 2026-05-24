@@ -6,11 +6,12 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { Notice, NoticeCategory, NoticePriority } from '../../models/notice.model';
 import { NoticeService } from '../../services/notice.service';
+import { DropdownComponent, DropdownOption } from '../resuable/dropdown/dropdown.component';
 
 @Component({
   selector: 'app-notices-board',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, DropdownComponent],
   templateUrl: './notices-board.component.html',
   styleUrl: './notices-board.component.scss'
 })
@@ -21,8 +22,8 @@ export class NoticesBoardComponent implements OnInit, OnDestroy {
   filteredNotices: Notice[] = [];
 
   searchQuery    = '';
-  filterCategory = '';
-  filterPriority = '';
+  filterCategory: NoticeCategory | null = null;
+  filterPriority: NoticePriority | null = null;
   showPinnedOnly = false;
   showForm       = false;
 
@@ -30,6 +31,36 @@ export class NoticesBoardComponent implements OnInit, OnDestroy {
   pinnedCount  = 0;
   urgentCount  = 0;
   expiredCount = 0;
+
+  categoryOptions: DropdownOption[] = [
+    { label: 'General', value: 'general' },
+    { label: 'Academic', value: 'academic' },
+    { label: 'Hostel', value: 'hostel' },
+    { label: 'Maintenance', value: 'maintenance' },
+    { label: 'Emergency', value: 'emergency' }
+  ];
+
+  priorityOptions: DropdownOption[] = [
+    { label: 'Normal', value: 'normal' },
+    { label: 'Important', value: 'important' },
+    { label: 'Urgent', value: 'urgent' }
+  ];
+
+  filterCategoryOptions: DropdownOption[] = [
+    { label: 'All Categories', value: null },
+    { label: 'General', value: 'general' },
+    { label: 'Academic', value: 'academic' },
+    { label: 'Hostel', value: 'hostel' },
+    { label: 'Maintenance', value: 'maintenance' },
+    { label: 'Emergency', value: 'emergency' }
+  ];
+
+  filterPriorityOptions: DropdownOption[] = [
+    { label: 'All Priorities', value: null },
+    { label: 'Normal', value: 'normal' },
+    { label: 'Important', value: 'important' },
+    { label: 'Urgent', value: 'urgent' }
+  ];
 
   form = this.emptyForm();
 
@@ -79,7 +110,9 @@ export class NoticesBoardComponent implements OnInit, OnDestroy {
   }
 
   clearFilters(): void {
-    this.searchQuery = this.filterCategory = this.filterPriority = '';
+    this.searchQuery = '';
+    this.filterCategory = null;
+    this.filterPriority = null;
     this.showPinnedOnly = false;
     this.applyFilters();
   }

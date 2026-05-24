@@ -14,7 +14,7 @@ export interface MessEnrollment {
 
 export interface MessNotification {
   id: string;
-  type: 'new_student' | 'timing' | 'announcement' | 'maintenance';
+  type: 'new_student' | 'timing' | 'announcement' | 'maintenance' | 'audit';
   title: string;
   message: string;
   priority: 'low' | 'medium' | 'high';
