@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ROOM_OPTIONS, MEAL_PLANS, DIETARY_OPTIONS } from '../../models/onboarding.model';
+import { ROOM_OPTIONS } from '../../models/onboarding.model';
 import { StudentService } from '../../services/student.service';
 
 @Component({
@@ -150,8 +150,10 @@ export class AddStudentComponent implements OnInit {
       status: 'pending' as const
     };
 
-    this.studentService.addStudent(studentData);
-    this.submitted = true;
+    this.studentService.addStudent(studentData).subscribe({
+      next: () => { this.submitted = true; },
+      error: () => {}
+    });
   }
 
   goToStudents(): void { this.router.navigate(['/admin/students']); }

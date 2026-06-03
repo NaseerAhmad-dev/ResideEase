@@ -1,13 +1,17 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { AuthService } from './auth.service';
+import { environment } from '../../environments/environment';
 
 export interface PublishedAuditRow {
-  studentId:   string;
-  studentName: string;
-  rollNumber:  string;
-  rebateDays:  number;
+  studentId:    string;
+  studentName:  string;
+  rollNumber:   string;
+  rebateDays:   number;
   billableDays: number;
-  billAmount:  number;
+  billAmount:   number;
 }
 
 export interface PublishedAudit {
@@ -25,42 +29,41 @@ export interface PublishedAudit {
   rows:              PublishedAuditRow[];
 }
 
+interface ApiResponse<T> { success: boolean; message: string; data: T; }
+
 @Injectable({ providedIn: 'root' })
 export class AuditHistoryService {
-  private readonly STORAGE_KEY = 'hostel-audit-history';
-  private readonly audits$ = new BehaviorSubject<PublishedAudit[]>(this.load());
+  private readonly http = inject(HttpClient);
+  private readonly authService = inject(AuthService);
 
-  getAll(): Observable<PublishedAudit[]> {
-    return this.audits$.asObservable();
+  private readonly audits$ = new BehaviorSubject<PublishedAudit[]>([]);
+
+  constructor() { this.refresh(); }
+
+  private get headers(): HttpHeaders {
+    return new HttpHeaders({ Authorization: `Bearer ${this.authService.getToken()}` });
   }
+
+  private refresh(): void {
+    this.http.get<ApiResponse<PublishedAudit[]>>(`${environment.apiUrl}/audit`, { headers: this.headers })
+      .subscribe({ next: res => this.audits$.next(res.data), error: () => {} });
+  }
+
+  getAll(): Observable<PublishedAudit[]> { return this.audits$.asObservable(); }
 
   getForMonth(month: number, year: number): PublishedAudit | undefined {
     return this.audits$.getValue().find(a => a.month === month && a.year === year);
   }
 
-  publish(data: Omit<PublishedAudit, 'id' | 'publishedAt'>): PublishedAudit {
-    const audit: PublishedAudit = {
-      ...data,
-      id:          `audit_${data.year}_${String(data.month).padStart(2, '0')}`,
-      publishedAt: new Date().toISOString(),
-    };
-    // Replace any existing audit for the same month/year
-    const rest = this.audits$.getValue().filter(a => !(a.month === data.month && a.year === data.year));
-    const updated = [audit, ...rest].sort((a, b) => b.year - a.year || b.month - a.month);
-    this.save(updated);
-    this.audits$.next(updated);
-    return audit;
-  }
-
-  private load(): PublishedAudit[] {
-    try {
-      return JSON.parse(localStorage.getItem(this.STORAGE_KEY) ?? '[]');
-    } catch {
-      return [];
-    }
-  }
-
-  private save(audits: PublishedAudit[]): void {
-    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(audits));
+  publish(data: Omit<PublishedAudit, 'id' | 'publishedAt'>): Observable<PublishedAudit> {
+    return this.http.post<ApiResponse<PublishedAudit>>(`${environment.apiUrl}/audit`, data, { headers: this.headers })
+      .pipe(
+        map(res => res.data),
+        map(audit => {
+          const rest = this.audits$.getValue().filter(a => !(a.month === audit.month && a.year === audit.year));
+          this.audits$.next([audit, ...rest].sort((a, b) => b.year - a.year || b.month - a.month));
+          return audit;
+        })
+      );
   }
 }

@@ -60,12 +60,14 @@ export class StudentProfileComponent implements OnInit {
 
   enrollForMess(): void {
     if (this.student && !this.todayEnrollment && !this.hasApprovedRebate) {
-      const enrollment = this.messService.enrollStudent(this.student);
-      if (enrollment) {
-        this.todayEnrollment = enrollment;
-        this.couponGenerated = true;
-        setTimeout(() => this.couponGenerated = false, 3000);
-      }
+      this.messService.enrollStudent(this.student).subscribe({
+        next: enrollment => {
+          this.todayEnrollment = enrollment;
+          this.couponGenerated = true;
+          setTimeout(() => this.couponGenerated = false, 3000);
+        },
+        error: () => {}
+      });
     }
   }
 

@@ -76,21 +76,27 @@ export class ManagerMessComponent implements OnInit, OnDestroy {
       this.couponMessage = `Already served — ${existing.studentName} collected their meal at ${this.formatTime(existing.servedAt)}.`;
       return;
     }
-    const ok = this.messService.validateAndServeCoupon(coupon);
-    if (ok) {
-      const e = this.messService.getEnrollmentByCoupon(coupon);
-      this.couponResult = 'success';
-      this.couponMessage = `Meal served to ${e?.studentName ?? 'student'} (${this.mealLabel(e?.mealType ?? '')}).`;
-      this.couponInput = '';
-      setTimeout(() => { this.couponResult = 'idle'; this.couponMessage = ''; }, 4000);
-    } else {
-      this.couponResult = 'error';
-      this.couponMessage = 'Invalid coupon. It may not exist or may be from a different date.';
-    }
+    this.messService.validateAndServeCoupon(coupon).subscribe({
+      next: enrollment => {
+        if (enrollment) {
+          this.couponResult = 'success';
+          this.couponMessage = `Meal served to ${enrollment.studentName} (${this.mealLabel(enrollment.mealType ?? '')}).`;
+          this.couponInput = '';
+          setTimeout(() => { this.couponResult = 'idle'; this.couponMessage = ''; }, 4000);
+        } else {
+          this.couponResult = 'error';
+          this.couponMessage = 'Invalid coupon. It may not exist or may be from a different date.';
+        }
+      },
+      error: () => {
+        this.couponResult = 'error';
+        this.couponMessage = 'Invalid coupon. It may not exist or may be from a different date.';
+      }
+    });
   }
 
   serveMeal(coupon: string): void {
-    this.messService.validateAndServeCoupon(coupon);
+    this.messService.validateAndServeCoupon(coupon).subscribe();
   }
 
   mealLabel(type: string): string {

@@ -193,26 +193,30 @@ export class ManagerAuditComponent implements OnInit, OnDestroy {
             perDayRate, studentCount, rebatedCount, totalStudentBill, rows } = this.result;
 
     // Save to audit history
-    const published = this.auditHistory.publish({
+    this.auditHistory.publish({
       month, year, daysInMonth, totalSupplierBill, totalBillableDays,
       perDayRate, studentCount, rebatedCount, totalStudentBill, rows,
+    }).subscribe({
+      next: published => {
+        this.publishedAudit = published;
+
+        // Notify each student
+        this.studentNotifs.addMany(rows.map(r => ({
+          studentId: r.studentId,
+          type:      'bill' as const,
+          title:     `Mess Bill — ${this.monthLabel} ${year}`,
+          message:   `Your mess bill for ${this.monthLabel} ${year} is INR ${r.billAmount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} (${r.billableDays} billable days${r.rebateDays > 0 ? `, rebate: ${r.rebateDays} days` : ''}).`,
+        })));
+
+        // Notify office via manager bell
+        this.messService.addAuditPublishedNotification(
+          this.monthLabel, year, totalStudentBill, perDayRate, studentCount
+        );
+
+        this.showToast(`Audit published — ${studentCount} students notified.`, 'success');
+      },
+      error: () => this.showToast('Failed to publish audit. Please try again.', 'error'),
     });
-    this.publishedAudit = published;
-
-    // Notify each student
-    this.studentNotifs.addMany(rows.map(r => ({
-      studentId: r.studentId,
-      type:      'bill' as const,
-      title:     `Mess Bill — ${this.monthLabel} ${year}`,
-      message:   `Your mess bill for ${this.monthLabel} ${year} is INR ${r.billAmount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} (${r.billableDays} billable days${r.rebateDays > 0 ? `, rebate: ${r.rebateDays} days` : ''}).`,
-    })));
-
-    // Notify office via manager bell
-    this.messService.addAuditPublishedNotification(
-      this.monthLabel, year, totalStudentBill, perDayRate, studentCount
-    );
-
-    this.showToast(`Audit published — ${studentCount} students notified.`, 'success');
   }
 
   // ── Export CSV ───────────────────────────────────────────────────────────

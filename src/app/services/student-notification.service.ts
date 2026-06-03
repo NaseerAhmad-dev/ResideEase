@@ -1,6 +1,9 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { AuthService } from './auth.service';
+import { environment } from '../../environments/environment';
 
 export interface StudentNotification {
   id:        string;
@@ -12,12 +15,27 @@ export interface StudentNotification {
   createdAt: string;
 }
 
+interface ApiResponse<T> { success: boolean; message: string; data: T; }
+
 @Injectable({ providedIn: 'root' })
 export class StudentNotificationService {
-  private readonly STORAGE_KEY = 'hostel-student-notifications';
-  private readonly notifs$ = new BehaviorSubject<StudentNotification[]>(this.load());
+  private readonly http = inject(HttpClient);
+  private readonly authService = inject(AuthService);
+
+  private readonly notifs$ = new BehaviorSubject<StudentNotification[]>([]);
+
+  private get headers(): HttpHeaders {
+    return new HttpHeaders({ Authorization: `Bearer ${this.authService.getToken()}` });
+  }
+
+  private loadForStudent(studentId: string): void {
+    this.http.get<ApiResponse<StudentNotification[]>>(
+      `${environment.apiUrl}/student-notifications/student/${studentId}`, { headers: this.headers }
+    ).subscribe({ next: res => this.notifs$.next(res.data), error: () => {} });
+  }
 
   getForStudent(studentId: string): Observable<StudentNotification[]> {
+    this.loadForStudent(studentId);
     return this.notifs$.pipe(
       map(all => all
         .filter(n => n.studentId === studentId)
@@ -33,43 +51,25 @@ export class StudentNotificationService {
   }
 
   addMany(items: Omit<StudentNotification, 'id' | 'createdAt' | 'isRead'>[]): void {
-    const now = new Date().toISOString();
-    const created: StudentNotification[] = items.map((n, i) => ({
-      ...n,
-      id:        `sn_${Date.now()}_${i}`,
-      isRead:    false,
-      createdAt: now,
-    }));
-    const updated = [...created, ...this.notifs$.getValue()];
-    this.save(updated);
-    this.notifs$.next(updated);
+    this.http.post<ApiResponse<null>>(`${environment.apiUrl}/student-notifications`, { items }, { headers: this.headers })
+      .subscribe({ error: () => {} });
   }
 
   markRead(id: string): void {
-    const updated = this.notifs$.getValue().map(n =>
-      n.id === id ? { ...n, isRead: true } : n
-    );
-    this.save(updated);
-    this.notifs$.next(updated);
+    this.http.put<ApiResponse<StudentNotification>>(
+      `${environment.apiUrl}/student-notifications/${id}/read`, {}, { headers: this.headers }
+    ).pipe(map(res => res.data)).subscribe({
+      next: updated => this.notifs$.next(this.notifs$.value.map(n => n.id === id ? updated : n)),
+      error: () => {}
+    });
   }
 
   markAllReadForStudent(studentId: string): void {
-    const updated = this.notifs$.getValue().map(n =>
-      n.studentId === studentId ? { ...n, isRead: true } : n
-    );
-    this.save(updated);
-    this.notifs$.next(updated);
-  }
-
-  private load(): StudentNotification[] {
-    try {
-      return JSON.parse(localStorage.getItem(this.STORAGE_KEY) ?? '[]');
-    } catch {
-      return [];
-    }
-  }
-
-  private save(notifs: StudentNotification[]): void {
-    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(notifs));
+    this.http.put<ApiResponse<null>>(
+      `${environment.apiUrl}/student-notifications/student/${studentId}/read-all`, {}, { headers: this.headers }
+    ).subscribe({
+      next: () => this.notifs$.next(this.notifs$.value.map(n => n.studentId === studentId ? { ...n, isRead: true } : n)),
+      error: () => {}
+    });
   }
 }

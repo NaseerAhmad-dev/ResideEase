@@ -16,8 +16,8 @@ export class GuestRegisterComponent implements OnInit, OnDestroy {
   step: 1 | 2 | 3 | 4 = 1;
 
   detailsForm = this.fb.group({
-    fullName: ['', [Validators.required, Validators.minLength(3)]],
-    phone: ['', [Validators.required, Validators.pattern(/^\d{10}$/)]],
+    fullName:      ['', [Validators.required, Validators.minLength(3)]],
+    phone:         ['', [Validators.required, Validators.pattern(/^\d{10}$/)]],
     aadhaarNumber: ['', [Validators.required, Validators.pattern(/^\d{12}$/)]]
   });
 
@@ -30,6 +30,7 @@ export class GuestRegisterComponent implements OnInit, OnDestroy {
   guestFee = 0;
   registeredGuest: GuestRegistration | null = null;
   resendTimer = 0;
+  loading = false;
   private timerInterval: ReturnType<typeof setInterval> | null = null;
 
   constructor(
@@ -50,37 +51,50 @@ export class GuestRegisterComponent implements OnInit, OnDestroy {
   get otpF() { return this.otpForm.controls; }
 
   submitDetails() {
-    if (this.detailsForm.invalid) {
-      this.detailsForm.markAllAsTouched();
-      return;
-    }
+    if (this.detailsForm.invalid) { this.detailsForm.markAllAsTouched(); return; }
     const phone = this.detailsForm.value.phone!;
-    this.generatedOtp = this.guestService.generateOtp(phone);
-    this.startResendTimer();
-    this.step = 2;
+    this.loading = true;
+    this.guestService.generateOtp(phone).subscribe({
+      next: res => {
+        this.generatedOtp = res.otp ?? '';
+        this.loading = false;
+        this.startResendTimer();
+        this.step = 2;
+      },
+      error: () => { this.loading = false; }
+    });
   }
 
   verifyOtp() {
     this.otpError = '';
-    if (this.otpForm.invalid) {
-      this.otpForm.markAllAsTouched();
-      return;
-    }
-    const otp = this.otpForm.value.otp!;
+    if (this.otpForm.invalid) { this.otpForm.markAllAsTouched(); return; }
+    const otp   = this.otpForm.value.otp!;
     const phone = this.detailsForm.value.phone!;
-    if (!this.guestService.validateOtp(otp, phone)) {
-      this.otpError = 'Invalid OTP. Please try again.';
-      return;
-    }
-    this.step = 3;
+    this.loading = true;
+    this.guestService.verifyOtp(phone, otp).subscribe({
+      next: verified => {
+        this.loading = false;
+        if (verified) { this.step = 3; }
+        else { this.otpError = 'Invalid OTP. Please try again.'; }
+      },
+      error: () => {
+        this.loading = false;
+        this.otpError = 'Invalid OTP. Please try again.';
+      }
+    });
   }
 
   resendOtp() {
     const phone = this.detailsForm.value.phone!;
-    this.generatedOtp = this.guestService.generateOtp(phone);
-    this.startResendTimer();
-    this.otpError = '';
-    this.otpForm.reset();
+    this.guestService.generateOtp(phone).subscribe({
+      next: res => {
+        this.generatedOtp = res.otp ?? '';
+        this.startResendTimer();
+        this.otpError = '';
+        this.otpForm.reset();
+      },
+      error: () => {}
+    });
   }
 
   private startResendTimer() {
@@ -88,29 +102,31 @@ export class GuestRegisterComponent implements OnInit, OnDestroy {
     if (this.timerInterval) clearInterval(this.timerInterval);
     this.timerInterval = setInterval(() => {
       this.resendTimer--;
-      if (this.resendTimer <= 0) {
-        clearInterval(this.timerInterval!);
-        this.resendTimer = 0;
-      }
+      if (this.resendTimer <= 0) { clearInterval(this.timerInterval!); this.resendTimer = 0; }
     }, 1000);
   }
 
   payFee() {
     const { fullName, phone, aadhaarNumber } = this.detailsForm.value;
-    this.registeredGuest = this.guestService.registerGuest({
-      fullName: fullName!,
-      phone: phone!,
+    this.loading = true;
+    this.guestService.registerGuest({
+      fullName:      fullName!,
+      phone:         phone!,
       aadhaarNumber: aadhaarNumber!,
-      feePaid: true,
-      feeAmount: this.guestFee,
-      status: 'paid'
+      feePaid:       true,
+      feeAmount:     this.guestFee,
+      status:        'paid'
+    }).subscribe({
+      next: guest => {
+        this.registeredGuest = guest;
+        this.loading = false;
+        this.step = 4;
+      },
+      error: () => { this.loading = false; }
     });
-    this.step = 4;
   }
 
-  goHome() {
-    this.router.navigate(['/']);
-  }
+  goHome() { this.router.navigate(['/']); }
 
   get maskedAadhaar(): string {
     const num = this.detailsForm.value.aadhaarNumber ?? '';

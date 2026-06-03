@@ -1,57 +1,55 @@
-import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { Injectable, inject } from '@angular/core';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { map, tap } from 'rxjs/operators';
 import { GuestRegistration } from '../models/guest.model';
-import { SettingsService } from './settings.service';
+import { AuthService } from './auth.service';
+import { environment } from '../../environments/environment';
+
+interface ApiResponse<T> { success: boolean; message: string; data: T; }
 
 @Injectable({ providedIn: 'root' })
 export class GuestService {
-  private guests = new BehaviorSubject<GuestRegistration[]>(this.loadGuests());
-  private currentOtp = '';
-  private otpPhone = '';
+  private readonly http = inject(HttpClient);
+  private readonly authService = inject(AuthService);
 
-  constructor(private settingsService: SettingsService) {}
+  private readonly guests = new BehaviorSubject<GuestRegistration[]>([]);
 
-  private loadGuests(): GuestRegistration[] {
-    const saved = localStorage.getItem('hostel-guests');
-    return saved ? JSON.parse(saved) : [];
+  constructor() {
+    this.refresh();
   }
 
-  private persist(guests: GuestRegistration[]) {
-    localStorage.setItem('hostel-guests', JSON.stringify(guests));
+  private get headers(): HttpHeaders {
+    return new HttpHeaders({ Authorization: `Bearer ${this.authService.getToken()}` });
   }
 
-  getGuests() {
-    return this.guests.asObservable();
+  private refresh(): void {
+    this.http.get<ApiResponse<GuestRegistration[]>>(`${environment.apiUrl}/guests`, { headers: this.headers })
+      .subscribe({ next: res => this.guests.next(res.data), error: () => {} });
   }
 
-  getGuestsValue(): GuestRegistration[] {
-    return this.guests.value;
+  getGuests(): Observable<GuestRegistration[]> { return this.guests.asObservable(); }
+  getGuestsValue(): GuestRegistration[]        { return this.guests.value; }
+
+  generateOtp(phone: string): Observable<{ otp?: string }> {
+    return this.http.post<ApiResponse<{ otp?: string }>>(`${environment.apiUrl}/guests/otp`, { phone })
+      .pipe(map(res => res.data));
   }
 
-  generateOtp(phone: string): string {
-    this.otpPhone = phone;
-    this.currentOtp = Math.floor(100000 + Math.random() * 900000).toString();
-    return this.currentOtp;
+  verifyOtp(phone: string, otp: string): Observable<boolean> {
+    return this.http.post<ApiResponse<{ verified: boolean }>>(`${environment.apiUrl}/guests/verify`, { phone, otp })
+      .pipe(map(res => res.data.verified));
   }
 
-  validateOtp(otp: string, phone: string): boolean {
-    return this.otpPhone === phone && this.currentOtp === otp;
+  registerGuest(data: Omit<GuestRegistration, 'id' | 'registeredAt' | 'receiptNumber'>): Observable<GuestRegistration> {
+    return this.http.post<ApiResponse<GuestRegistration>>(`${environment.apiUrl}/guests/register`, data)
+      .pipe(
+        map(res => res.data),
+        tap(guest => this.guests.next([...this.guests.value, guest]))
+      );
   }
 
   getGuestFee(): number {
-    return this.settingsService.getSettings()().guestFee ?? 200;
-  }
-
-  registerGuest(data: Omit<GuestRegistration, 'id' | 'registeredAt' | 'receiptNumber'>): GuestRegistration {
-    const guest: GuestRegistration = {
-      ...data,
-      id: 'G' + Date.now(),
-      registeredAt: new Date().toISOString(),
-      receiptNumber: 'GR-' + Math.random().toString(36).substring(2, 10).toUpperCase()
-    };
-    const updated = [...this.guests.value, guest];
-    this.guests.next(updated);
-    this.persist(updated);
-    return guest;
+    return 200;
   }
 }

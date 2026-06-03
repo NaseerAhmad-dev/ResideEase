@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
+import { environment } from '../../environments/environment';
 
-const API = 'http://localhost:3000/api';
+const API = environment.apiUrl;
 const TOKEN_KEY = 'resideease_token';
 const USER_KEY  = 'resideease_user';
 

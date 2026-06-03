@@ -1,147 +1,133 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { AppSettings, HostelSettings, RoomSettings, MealSettings, SystemSettings, PolicySettings, AdminProfile } from '../models/settings.model';
 import { ROOM_OPTIONS, MEAL_PLANS, DIETARY_OPTIONS } from '../models/onboarding.model';
+import { AuthService } from './auth.service';
+import { environment } from '../../environments/environment';
 
-@Injectable({
-  providedIn: 'root'
-})
+interface ApiResponse<T> { success: boolean; message: string; data: T; }
+
+const DEFAULT: AppSettings = {
+  hostel: {
+    name: 'ResideEase Hostel',
+    address: '123 University Road, Campus Area, Pune - 411007',
+    phone: '+91 98765 43210',
+    email: 'admin@resideease.com',
+    website: 'https://resideease.com',
+    description: 'Modern hostel accommodation for students with 24/7 security, Wi-Fi, and quality mess facilities.',
+    totalRooms: 120,
+    establishedYear: 2018,
+    affiliation: 'Savitribai Phule Pune University',
+    wardenName: 'Dr. Ramesh Kulkarni',
+    wardenPhone: '+91 98765 43211',
+  },
+  rooms: ROOM_OPTIONS.map(r => ({ id: r.id, label: r.label, price: r.price, securityDeposit: r.price * 2, enabled: true })),
+  meals: MEAL_PLANS.map(m => ({ id: m.id, label: m.label, price: m.price, enabled: true })),
+  dietaryOptions: [...DIETARY_OPTIONS],
+  policies: {
+    checkInTime: '10:00', checkOutTime: '10:00',
+    visitingHoursFrom: '06:00', visitingHoursTo: '21:00',
+    lateFeePercent: 2, gracePeriodDays: 5,
+    noticeBeforeCheckout: 30, guestMaxNights: 2,
+  },
+  system: {
+    allowOnlineBooking: true, requireApproval: true,
+    maintenanceMode: false, notificationsEnabled: true,
+    smsNotifications: false, autoReminderDays: 7,
+    academicYear: '2025-26', maintenanceCharge: 500,
+  },
+  guestFee: 200,
+  admin: { name: 'Office Admin', email: 'admin@resideease.com', phone: '+91 98765 43210', designation: 'Hostel Office' },
+};
+
+@Injectable({ providedIn: 'root' })
 export class SettingsService {
-  private readonly settings = signal<AppSettings>({
-    hostel: {
-      name: 'ResideEase Hostel',
-      address: '123 University Road, Campus Area, Pune - 411007',
-      phone: '+91 98765 43210',
-      email: 'admin@resideease.com',
-      website: 'https://resideease.com',
-      description: 'Modern hostel accommodation for students with 24/7 security, Wi-Fi, and quality mess facilities.',
-      totalRooms: 120,
-      establishedYear: 2018,
-      affiliation: 'Savitribai Phule Pune University',
-      wardenName: 'Dr. Ramesh Kulkarni',
-      wardenPhone: '+91 98765 43211'
-    },
-    rooms: ROOM_OPTIONS.map(room => ({
-      id: room.id,
-      label: room.label,
-      price: room.price,
-      securityDeposit: room.price * 2,
-      enabled: true
-    })),
-    meals: MEAL_PLANS.map(meal => ({
-      id: meal.id,
-      label: meal.label,
-      price: meal.price,
-      enabled: true
-    })),
-    dietaryOptions: [...DIETARY_OPTIONS],
-    policies: {
-      checkInTime: '10:00',
-      checkOutTime: '10:00',
-      visitingHoursFrom: '06:00',
-      visitingHoursTo: '21:00',
-      lateFeePercent: 2,
-      gracePeriodDays: 5,
-      noticeBeforeCheckout: 30,
-      guestMaxNights: 2
-    },
-    system: {
-      allowOnlineBooking: true,
-      requireApproval: true,
-      maintenanceMode: false,
-      notificationsEnabled: true,
-      smsNotifications: false,
-      autoReminderDays: 7,
-      academicYear: '2025-26',
-      maintenanceCharge: 500
-    },
-    guestFee: 200,
-    admin: {
-      name: 'Office Admin',
-      email: 'admin@resideease.com',
-      phone: '+91 98765 43210',
-      designation: 'Hostel Office'
-    }
-  });
+  private readonly http = inject(HttpClient);
+  private readonly authService = inject(AuthService);
 
-  getSettings() {
-    return this.settings.asReadonly();
+  private readonly settings = signal<AppSettings>(DEFAULT);
+
+  constructor() {
+    this.loadSettings();
   }
 
-  updateHostelSettings(settings: Partial<HostelSettings>) {
-    this.settings.update(current => ({
-      ...current,
-      hostel: { ...current.hostel, ...settings }
-    }));
+  private get headers(): HttpHeaders {
+    return new HttpHeaders({ Authorization: `Bearer ${this.authService.getToken()}` });
   }
 
-  updateRoomSettings(roomId: string, settings: Partial<RoomSettings>) {
-    this.settings.update(current => ({
-      ...current,
-      rooms: current.rooms.map(room =>
-        room.id === roomId ? { ...room, ...settings } : room
-      )
-    }));
+  getSettings() { return this.settings.asReadonly(); }
+
+  loadSettings(): void {
+    this.http.get<ApiResponse<any>>(`${environment.apiUrl}/settings`, { headers: this.headers })
+      .subscribe({
+        next: res => {
+          const s = res.data;
+          this.settings.update(cur => ({
+            hostel:         { ...cur.hostel,   ...(s.hostel  ?? {}) },
+            rooms:          s.rooms          ?? cur.rooms,
+            meals:          s.meals          ?? cur.meals,
+            dietaryOptions: s.dietaryOptions ?? cur.dietaryOptions,
+            policies:       { ...cur.policies, ...(s.hostel?.policies ?? {}) },
+            system:         { ...cur.system,   ...(s.system  ?? {}) },
+            guestFee:       s.guestFee       ?? cur.guestFee,
+            admin:          { ...cur.admin,    ...(s.hostel?.admin    ?? {}) },
+          }));
+        },
+        error: () => {}
+      });
   }
 
-  updateMealSettings(mealId: string, settings: Partial<MealSettings>) {
-    this.settings.update(current => ({
-      ...current,
-      meals: current.meals.map(meal =>
-        meal.id === mealId ? { ...meal, ...settings } : meal
-      )
-    }));
+  saveSettings(): Promise<void> {
+    const s = this.settings();
+    const payload = {
+      hostel:         { ...s.hostel, policies: s.policies, admin: s.admin },
+      rooms:          s.rooms,
+      meals:          s.meals,
+      dietaryOptions: s.dietaryOptions,
+      system:         s.system,
+      guestFee:       s.guestFee,
+    };
+    return new Promise(resolve => {
+      this.http.put<ApiResponse<any>>(`${environment.apiUrl}/settings`, payload, { headers: this.headers })
+        .subscribe({ next: () => resolve(), error: () => resolve() });
+    });
   }
 
-  updateDietaryOptions(options: string[]) {
-    this.settings.update(current => ({
-      ...current,
-      dietaryOptions: [...options]
-    }));
+  updateHostelSettings(updates: Partial<HostelSettings>): void {
+    this.settings.update(cur => ({ ...cur, hostel: { ...cur.hostel, ...updates } }));
+    this.http.put<ApiResponse<any>>(`${environment.apiUrl}/settings/hostel`, { ...this.settings().hostel }, { headers: this.headers })
+      .subscribe({ error: () => {} });
   }
 
-  updateSystemSettings(settings: Partial<SystemSettings>) {
-    this.settings.update(current => ({
-      ...current,
-      system: { ...current.system, ...settings }
-    }));
+  updateRoomSettings(roomId: string, updates: Partial<RoomSettings>): void {
+    this.settings.update(cur => ({ ...cur, rooms: cur.rooms.map(r => r.id === roomId ? { ...r, ...updates } : r) }));
+    this.http.put<ApiResponse<any>>(`${environment.apiUrl}/settings/rooms/${roomId}`, updates, { headers: this.headers })
+      .subscribe({ error: () => {} });
   }
 
-  updatePolicySettings(settings: Partial<PolicySettings>) {
-    this.settings.update(current => ({
-      ...current,
-      policies: { ...current.policies, ...settings }
-    }));
+  updateMealSettings(mealId: string, updates: Partial<MealSettings>): void {
+    this.settings.update(cur => ({ ...cur, meals: cur.meals.map(m => m.id === mealId ? { ...m, ...updates } : m) }));
+    this.http.put<ApiResponse<any>>(`${environment.apiUrl}/settings/meals/${mealId}`, updates, { headers: this.headers })
+      .subscribe({ error: () => {} });
   }
 
-  updateAdminProfile(profile: Partial<AdminProfile>) {
-    this.settings.update(current => ({
-      ...current,
-      admin: { ...current.admin, ...profile }
-    }));
+  updateDietaryOptions(options: string[]): void {
+    this.settings.update(cur => ({ ...cur, dietaryOptions: [...options] }));
+    this.http.put<ApiResponse<any>>(`${environment.apiUrl}/settings`, { dietaryOptions: options }, { headers: this.headers })
+      .subscribe({ error: () => {} });
   }
 
-  saveSettings() {
-    const settings = this.settings();
-    localStorage.setItem('hostel-settings', JSON.stringify(settings));
-    return Promise.resolve();
+  updateSystemSettings(updates: Partial<SystemSettings>): void {
+    this.settings.update(cur => ({ ...cur, system: { ...cur.system, ...updates } }));
+    this.http.put<ApiResponse<any>>(`${environment.apiUrl}/settings/system`, updates, { headers: this.headers })
+      .subscribe({ error: () => {} });
   }
 
-  loadSettings() {
-    const saved = localStorage.getItem('hostel-settings');
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        this.settings.update(current => ({
-          ...current,
-          ...parsed,
-          hostel: { ...current.hostel, ...parsed.hostel },
-          policies: { ...current.policies, ...parsed.policies },
-          system: { ...current.system, ...parsed.system },
-          admin: { ...current.admin, ...parsed.admin }
-        }));
-      } catch (error) {
-        console.error('Failed to load settings:', error);
-      }
-    }
+  updatePolicySettings(updates: Partial<PolicySettings>): void {
+    this.settings.update(cur => ({ ...cur, policies: { ...cur.policies, ...updates } }));
+  }
+
+  updateAdminProfile(updates: Partial<AdminProfile>): void {
+    this.settings.update(cur => ({ ...cur, admin: { ...cur.admin, ...updates } }));
   }
 }
