@@ -85,12 +85,12 @@ export class ManagerRebatesComponent implements OnInit, OnDestroy {
   }
 
   approve(id: string): void {
-    this.rebateService.approveRequest(id, 'Hostel Manager');
+    this.rebateService.approveRequest(id, 'Mess Manager');
     this.showToast('Rebate approved successfully.', 'success');
   }
 
   reject(id: string): void {
-    this.rebateService.rejectRequest(id, 'Hostel Manager');
+    this.rebateService.rejectRequest(id, 'Mess Manager');
     this.showToast('Rebate request rejected.', 'error');
   }
 

@@ -11,7 +11,7 @@ import { MessStats } from '../models/mess.model';
   styleUrls: ['./manager-dashboard.component.scss']
 })
 export class ManagerDashboardComponent implements OnInit {
-  managerName = 'Hostel Manager';
+  managerName = 'Mess Manager';
   hostelName  = 'Maple Residency';
 
   messStats: MessStats = { totalSubscribed: 0, totalServed: 0, pendingStudents: 0, todayDate: '' };

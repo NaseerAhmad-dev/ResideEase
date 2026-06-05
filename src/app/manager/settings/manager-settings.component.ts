@@ -20,7 +20,7 @@ export class ManagerSettingsComponent {
   activeTab: 'profile' | 'security' | 'notifications' = 'profile';
 
   profile = {
-    name: 'Hostel Manager',
+    name: 'Mess Manager',
     hostel: 'Maple Residency',
     email: 'manager@resideease.com',
     phone: '+91 98765 43210',

@@ -35,7 +35,7 @@ export class StudentProfileComponent implements OnInit {
   ) {}
 
   signOut(): void {
-    this.router.navigate(['/student/login']);
+    this.router.navigate(['/login']);
   }
 
   ngOnInit(): void {

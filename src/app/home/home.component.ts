@@ -1,94 +1,68 @@
-import { Component, Inject } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { StudentService } from '../services/student.service';
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-home',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
-  providers: [StudentService],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss']
 })
 export class HomeComponent {
-  activeTab: 'admin' | 'manager' | 'student' = 'admin';
 
-  adminForm = this.fb.group({
-    username: ['', Validators.required],
-    password: ['', Validators.required]
+  form = this.fb.group({
+    identifier: ['', Validators.required],
+    secret:     ['', Validators.required],
   });
 
-  managerForm = this.fb.group({
-    username: ['', Validators.required],
-    password: ['', Validators.required]
-  });
-
-  studentForm = this.fb.group({
-    rollNumber: ['', Validators.required],
-    phone: ['', Validators.required]
-  });
-
-  adminError   = '';
-  managerError = '';
-  studentError = '';
+  error   = '';
+  loading = false;
+  showSecret = false;
 
   constructor(
     private readonly fb: FormBuilder,
     private readonly router: Router,
-    @Inject(StudentService) private readonly studentService: StudentService
+    private readonly authService: AuthService,
   ) {}
 
-  loginAdmin(): void {
-    this.adminError = '';
-    if (this.adminForm.invalid) {
-      this.adminError = 'Please enter username and password.';
-      return;
-    }
-    const { username, password } = this.adminForm.value;
-    if (username === 'admin' && password === 'admin123') {
-      this.router.navigate(['/admin/dashboard']);
-    } else {
-      this.adminError = 'Invalid credentials. Please try again.';
-    }
+  login(): void {
+    this.error = '';
+    if (this.form.invalid) { this.error = 'Please fill in both fields.'; return; }
+
+    const { identifier, secret } = this.form.value;
+    this.loading = true;
+
+    // Try staff login first
+    this.authService.loginManager(identifier!, secret!).subscribe({
+      next: res => {
+        this.loading = false;
+        const role = res.data?.user?.role;
+        if      (role === 'super_admin')               this.router.navigate(['/super-admin/dashboard']);
+        else if (role === 'admin' || role === 'office') this.router.navigate(['/admin/dashboard']);
+        else if (role === 'manager')                   this.router.navigate(['/manager/dashboard']);
+        else { this.authService.clearSession(); this.tryStudentLogin(identifier!, secret!); }
+      },
+      error: () => this.tryStudentLogin(identifier!, secret!),
+    });
+  }
+
+  private tryStudentLogin(rollNumber: string, phone: string): void {
+    this.authService.loginStudent(rollNumber, phone).subscribe({
+      next: res => {
+        this.loading = false;
+        this.router.navigate(['/student/profile', res.data.user.id]);
+      },
+      error: () => {
+        this.loading = false;
+        this.error = 'Invalid credentials. Please check and try again.';
+      },
+    });
   }
 
   registerAsGuest(): void {
     this.router.navigate(['/guest/register']);
-  }
-
-  loginManager(): void {
-    this.managerError = '';
-    if (this.managerForm.invalid) {
-      this.managerError = 'Please enter username and password.';
-      return;
-    }
-    const { username, password } = this.managerForm.value;
-    if (username === 'manager' && password === 'manager123') {
-      this.router.navigate(['/manager/dashboard']);
-    } else {
-      this.managerError = 'Invalid credentials. Please try again.';
-    }
-  }
-
-  loginStudent(): void {
-    this.studentError = '';
-    if (this.studentForm.invalid) {
-      this.studentError = 'Please enter your roll number and phone number.';
-      return;
-    }
-    const { rollNumber, phone } = this.studentForm.value;
-    const normalizedRoll = rollNumber?.toString().trim().toLowerCase();
-    const normalizedPhone = phone?.toString().trim();
-    const student = this.studentService.getStudentsValue().find(s =>
-      s.rollNumber.trim().toLowerCase() === normalizedRoll &&
-      s.phone.trim() === normalizedPhone
-    );
-    if (!student) {
-      this.studentError = 'No matching student found. Check your roll number and phone.';
-      return;
-    }
-    this.router.navigate(['/student/profile', student.id]);
   }
 }

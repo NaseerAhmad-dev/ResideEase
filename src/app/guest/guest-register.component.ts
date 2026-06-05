@@ -4,11 +4,12 @@ import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { GuestService } from '../services/guest.service';
 import { GuestRegistration } from '../models/guest.model';
+import { AppValidators, FieldErrorComponent } from '../shared';
 
 @Component({
   selector: 'app-guest-register',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, FieldErrorComponent],
   templateUrl: './guest-register.component.html',
   styleUrls: ['./guest-register.component.scss']
 })
@@ -17,12 +18,12 @@ export class GuestRegisterComponent implements OnInit, OnDestroy {
 
   detailsForm = this.fb.group({
     fullName:      ['', [Validators.required, Validators.minLength(3)]],
-    phone:         ['', [Validators.required, Validators.pattern(/^\d{10}$/)]],
-    aadhaarNumber: ['', [Validators.required, Validators.pattern(/^\d{12}$/)]]
+    phone:         ['', [Validators.required, AppValidators.phone]],
+    aadhaarNumber: ['', [Validators.required, AppValidators.aadhaar]],
   });
 
   otpForm = this.fb.group({
-    otp: ['', [Validators.required, Validators.pattern(/^\d{6}$/)]]
+    otp: ['', [Validators.required, AppValidators.otp]],
   });
 
   generatedOtp = '';

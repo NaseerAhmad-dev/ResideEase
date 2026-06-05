@@ -68,12 +68,7 @@
             <input id="fullName" type="text" formControlName="fullName"
               placeholder="Enter your full name" autocomplete="name"
               [class.input-error]="f['fullName'].invalid && f['fullName'].touched"/>
-            @if (f['fullName'].invalid && f['fullName'].touched) {
-              <span class="field-error">
-                @if (f['fullName'].errors?.['required']) { Name is required. }
-                @if (f['fullName'].errors?.['minlength']) { Name must be at least 3 characters. }
-              </span>
-            }
+            <app-field-error [control]="f['fullName']" />
           </div>
 
           <div class="field-group">
@@ -81,11 +76,7 @@
             <input id="phone" type="tel" formControlName="phone"
               placeholder="10-digit mobile number" autocomplete="tel" maxlength="10"
               [class.input-error]="f['phone'].invalid && f['phone'].touched"/>
-            @if (f['phone'].invalid && f['phone'].touched) {
-              <span class="field-error">
-                Enter a valid 10-digit phone number.
-              </span>
-            }
+            <app-field-error [control]="f['phone']" />
           </div>
 
           <div class="field-group">
@@ -93,11 +84,7 @@
             <input id="aadhaar" type="text" formControlName="aadhaarNumber"
               placeholder="12-digit Aadhaar number" maxlength="12" inputmode="numeric"
               [class.input-error]="f['aadhaarNumber'].invalid && f['aadhaarNumber'].touched"/>
-            @if (f['aadhaarNumber'].invalid && f['aadhaarNumber'].touched) {
-              <span class="field-error">
-                Enter a valid 12-digit Aadhaar number.
-              </span>
-            }
+            <app-field-error [control]="f['aadhaarNumber']" />
           </div>
 
           <button class="btn-primary" type="submit">
@@ -137,9 +124,7 @@
               placeholder="6-digit OTP" maxlength="6" inputmode="numeric"
               class="otp-input"
               [class.input-error]="otpF['otp'].invalid && otpF['otp'].touched"/>
-            @if (otpF['otp'].invalid && otpF['otp'].touched) {
-              <span class="field-error">Enter a valid 6-digit OTP.</span>
-            }
+            <app-field-error [control]="otpF['otp']" />
           </div>
 
           @if (otpError) {

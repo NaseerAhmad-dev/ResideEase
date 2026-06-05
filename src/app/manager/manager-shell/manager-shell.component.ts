@@ -3,6 +3,7 @@ import { Router, RouterOutlet, RouterLink, RouterLinkActive } from '@angular/rou
 import { CommonModule } from '@angular/common';
 import { MessService } from '../../services/mess.service';
 import { MessNotification } from '../../models/mess.model';
+import { AuthService } from '../../services/auth.service';
 import { Subscription } from 'rxjs';
 
 interface NavItem {
@@ -22,6 +23,7 @@ interface NavItem {
 export class ManagerShellComponent implements OnInit, OnDestroy {
   private readonly router = inject(Router);
   private readonly messService = inject(MessService);
+  private readonly authService = inject(AuthService);
 
   sidebarOpen = signal(true);
   notifOpen   = signal(false);
@@ -92,7 +94,8 @@ export class ManagerShellComponent implements OnInit, OnDestroy {
   }
 
   signOut(): void {
-    this.router.navigate(['/manager/login']);
+    this.authService.clearSession();
+    this.router.navigate(['/login']);
   }
 
   timeAgo(dateStr: string): string {

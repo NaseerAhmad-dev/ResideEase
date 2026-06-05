@@ -1,197 +1,89 @@
 <div class="home-page">
 
-  <!-- Brand header -->
+  <!-- Brand -->
   <div class="home-brand">
-    <div class="brand-logo" aria-label="ResideEase logo">
-      <svg width="32" height="32" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <rect width="28" height="28" rx="8" fill="#0ab4a8"/>
-        <path d="M14 5L5 11v12h6v-7h6v7h6V11L14 5z" fill="white"/>
-      </svg>
-    </div>
+    <svg width="32" height="32" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <rect width="28" height="28" rx="8" fill="#0ab4a8"/>
+      <path d="M14 5L5 11v12h6v-7h6v7h6V11L14 5z" fill="white"/>
+    </svg>
     <span class="brand-name">ResideEase</span>
   </div>
 
   <div class="home-card">
 
-    <!-- Card head -->
     <div class="card-head">
       <h1>Welcome back</h1>
-      <p>Select your role to sign in to the system.</p>
+      <p>Sign in to continue. Your dashboard will open automatically based on your role.</p>
     </div>
 
-    <!-- Role tabs -->
-    <div class="role-tabs" role="tablist">
-      <button role="tab" [class.active]="activeTab === 'admin'" (click)="activeTab = 'admin'" [attr.aria-selected]="activeTab === 'admin'">
-        <svg width="15" height="15" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-          <rect x="2" y="2" width="7" height="7" rx="1.5" fill="currentColor"/>
-          <rect x="11" y="2" width="7" height="7" rx="1.5" fill="currentColor"/>
-          <rect x="2" y="11" width="7" height="7" rx="1.5" fill="currentColor"/>
-          <rect x="11" y="11" width="7" height="7" rx="1.5" fill="currentColor"/>
-        </svg>
-        Admin / Office
-      </button>
-      <button role="tab" [class.active]="activeTab === 'manager'" (click)="activeTab = 'manager'" [attr.aria-selected]="activeTab === 'manager'">
-        <svg width="15" height="15" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-          <path d="M10 10a3 3 0 100-6 3 3 0 000 6zm-6 8a6 6 0 0112 0H4zm11-8a3 3 0 10-1.5-5.6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-        </svg>
-        Manager
-      </button>
-      <button role="tab" [class.active]="activeTab === 'student'" (click)="activeTab = 'student'" [attr.aria-selected]="activeTab === 'student'">
-        <svg width="15" height="15" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-          <path d="M10 2L2 7l8 5 8-5-8-5zM2 13l8 5 8-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-        Student
-      </button>
+    <div class="card-body">
+      <form [formGroup]="form" (ngSubmit)="login()" novalidate>
+
+        <div class="field-group">
+          <label for="identifier">Username / Email / Roll Number</label>
+          <div class="input-wrap">
+            <svg class="input-icon" width="15" height="15" viewBox="0 0 20 20" fill="none">
+              <circle cx="10" cy="7" r="3" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M4 17c0-3.314 2.686-5 6-5s6 1.686 6 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+            <input id="identifier" type="text" formControlName="identifier"
+                   placeholder="Enter username, email or roll number"
+                   autocomplete="off" />
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label for="secret">Password / Phone Number</label>
+          <div class="input-wrap">
+            <svg class="input-icon" width="15" height="15" viewBox="0 0 20 20" fill="none">
+              <rect x="3" y="9" width="14" height="9" rx="2" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M7 9V6a3 3 0 016 0v3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+            <input id="secret" [type]="showSecret ? 'text' : 'password'" formControlName="secret"
+                   placeholder="Enter password or phone number"
+                   autocomplete="off" />
+            <button type="button" class="toggle-secret" (click)="showSecret = !showSecret"
+                    [attr.aria-label]="showSecret ? 'Hide' : 'Show'">
+              @if (showSecret) {
+                <svg width="15" height="15" viewBox="0 0 20 20" fill="none"><path d="M3 3l14 14M8.5 8.7A3 3 0 0012.8 13M6.5 6.7C4.6 7.9 3 10 3 10s3 5 7 5c1.4 0 2.7-.5 3.8-1.2M10.5 5.1C10.3 5 10.2 5 10 5c-4 0-7 5-7 5s.7 1.1 2 2.3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+              } @else {
+                <svg width="15" height="15" viewBox="0 0 20 20" fill="none"><path d="M1 10s3-6 9-6 9 6 9 6-3 6-9 6-9-6-9-6z" stroke="currentColor" stroke-width="1.4"/><circle cx="10" cy="10" r="2.5" stroke="currentColor" stroke-width="1.4"/></svg>
+              }
+            </button>
+          </div>
+        </div>
+
+        @if (error) {
+          <div class="error-msg">
+            <svg width="14" height="14" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"/><path d="M10 6v4M10 13v1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            {{ error }}
+          </div>
+        }
+
+        <button class="btn-signin" type="submit" [disabled]="loading">
+          @if (loading) {
+            <span class="spinner"></span> Signing in…
+          } @else {
+            Sign In
+            <svg width="15" height="15" viewBox="0 0 20 20" fill="none">
+              <path d="M4 10h12M10 4l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          }
+        </button>
+
+      </form>
     </div>
-
-    <!-- ── Admin panel ── -->
-    @if (activeTab === 'admin') {
-      <div class="tab-panel" role="tabpanel">
-        <div class="panel-info panel-info--brand">
-          <div class="panel-info-icon">
-            <svg width="22" height="22" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-              <rect x="2" y="2" width="7" height="7" rx="1.5" fill="currentColor" opacity="0.8"/>
-              <rect x="11" y="2" width="7" height="7" rx="1.5" fill="currentColor"/>
-              <rect x="2" y="11" width="7" height="7" rx="1.5" fill="currentColor"/>
-              <rect x="11" y="11" width="7" height="7" rx="1.5" fill="currentColor" opacity="0.8"/>
-            </svg>
-          </div>
-          <div>
-            <div class="panel-info-title">Office / Admin access</div>
-            <div class="panel-info-sub">Manage students, rooms, mess, payments, maintenance requests and hostel settings.</div>
-          </div>
-        </div>
-
-        <form [formGroup]="adminForm" (ngSubmit)="loginAdmin()" novalidate>
-          <div class="field-group">
-            <label for="adm-username">Username</label>
-            <input id="adm-username" type="text" formControlName="username" placeholder="Enter username" autocomplete="username"/>
-          </div>
-          <div class="field-group">
-            <label for="adm-password">Password</label>
-            <input id="adm-password" type="password" formControlName="password" placeholder="Enter password" autocomplete="current-password"/>
-          </div>
-          @if (adminError) {
-            <div class="error-msg">
-              <svg width="13" height="13" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"/><path d="M10 6v4M10 13v1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-              {{ adminError }}
-            </div>
-          }
-          <button class="btn-primary" type="submit">
-            Sign in to Office
-            <svg width="14" height="14" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-              <path d="M4 10h12M10 4l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </button>
-        </form>
-
-        <div class="demo-hint">
-          <svg width="13" height="13" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"/><path d="M10 9v5M10 6v1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-          Demo credentials &mdash; username: <strong>admin</strong> &nbsp; password: <strong>admin123</strong>
-        </div>
-      </div>
-    }
-
-    <!-- ── Manager panel ── -->
-    @if (activeTab === 'manager') {
-      <div class="tab-panel" role="tabpanel">
-        <div class="panel-info panel-info--amber">
-          <div class="panel-info-icon">
-            <svg width="22" height="22" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-              <path d="M10 10a3 3 0 100-6 3 3 0 000 6zm-6 8a6 6 0 0112 0H4z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-            </svg>
-          </div>
-          <div>
-            <div class="panel-info-title">Manager access</div>
-            <div class="panel-info-sub">Verify mess coupons, view today's enrollment and manage meal distribution.</div>
-          </div>
-        </div>
-
-        <form [formGroup]="managerForm" (ngSubmit)="loginManager()" novalidate>
-          <div class="field-group">
-            <label for="mgr-username">Username</label>
-            <input id="mgr-username" type="text" formControlName="username" placeholder="Enter username" autocomplete="username"/>
-          </div>
-          <div class="field-group">
-            <label for="mgr-password">Password</label>
-            <input id="mgr-password" type="password" formControlName="password" placeholder="Enter password" autocomplete="current-password"/>
-          </div>
-          @if (managerError) {
-            <div class="error-msg">
-              <svg width="13" height="13" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"/><path d="M10 6v4M10 13v1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-              {{ managerError }}
-            </div>
-          }
-          <button class="btn-primary" type="submit">
-            Sign in as Manager
-            <svg width="14" height="14" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-              <path d="M4 10h12M10 4l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </button>
-        </form>
-
-        <div class="demo-hint">
-          <svg width="13" height="13" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"/><path d="M10 9v5M10 6v1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-          Demo credentials &mdash; username: <strong>manager</strong> &nbsp; password: <strong>manager123</strong>
-        </div>
-      </div>
-    }
-
-    <!-- ── Student panel ── -->
-    @if (activeTab === 'student') {
-      <div class="tab-panel" role="tabpanel">
-        <div class="panel-info panel-info--green">
-          <div class="panel-info-icon">
-            <svg width="22" height="22" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-              <path d="M10 2L2 7l8 5 8-5-8-5zM2 13l8 5 8-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </div>
-          <div>
-            <div class="panel-info-title">Student access</div>
-            <div class="panel-info-sub">View your profile, hostel details, fee status and enroll for mess using your roll number and phone.</div>
-          </div>
-        </div>
-
-        <form [formGroup]="studentForm" (ngSubmit)="loginStudent()" novalidate>
-          <div class="field-group">
-            <label for="stu-roll">Roll number</label>
-            <input id="stu-roll" type="text" formControlName="rollNumber" placeholder="e.g. STU12345" autocomplete="username"/>
-          </div>
-          <div class="field-group">
-            <label for="stu-phone">Phone number</label>
-            <input id="stu-phone" type="tel" formControlName="phone" placeholder="e.g. 9876543210" autocomplete="tel"/>
-          </div>
-          @if (studentError) {
-            <div class="error-msg">
-              <svg width="13" height="13" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"/><path d="M10 6v4M10 13v1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-              {{ studentError }}
-            </div>
-          }
-          <button class="btn-primary btn-primary--green" type="submit">
-            View my dashboard
-            <svg width="14" height="14" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-              <path d="M4 10h12M10 4l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </button>
-        </form>
-
-        <div class="demo-hint">
-          <svg width="13" height="13" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"/><path d="M10 9v5M10 6v1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-          Student accounts are created by the admin. Add a student first from the Admin panel.
-        </div>
-      </div>
-    }
 
   </div>
 
   <div class="guest-cta">
-    <svg width="14" height="14" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+    <svg width="14" height="14" viewBox="0 0 20 20" fill="none">
       <path d="M10 10a3.5 3.5 0 100-7 3.5 3.5 0 000 7zm-6.5 8a6.5 6.5 0 0113 0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
     </svg>
     Visiting as a guest?
     <button type="button" (click)="registerAsGuest()">Register here</button>
   </div>
 
-  <p class="home-footer">SA Hostel Zakura &mdash; Powered by ResideEase</p>
+  <p class="home-footer">Powered by ResideEase</p>
 
 </div>

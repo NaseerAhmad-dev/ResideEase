@@ -3,6 +3,11 @@ import { Routes } from '@angular/router';
 export const routes: Routes = [
   {
     path: '',
+    redirectTo: 'login',
+    pathMatch: 'full'
+  },
+  {
+    path: 'login',
     loadComponent: () => import('./home/home.component').then(m => m.HomeComponent)
   },
   {
@@ -56,11 +61,6 @@ export const routes: Routes = [
   {
     path: 'student',
     children: [
-      { path: '', redirectTo: 'login', pathMatch: 'full' },
-      {
-        path: 'login',
-        loadComponent: () => import('./student/student-login.component').then(m => m.StudentLoginComponent)
-      },
       {
         path: 'profile/:id',
         loadComponent: () => import('./student/student-profile.component').then(m => m.StudentProfileComponent)
@@ -70,11 +70,7 @@ export const routes: Routes = [
   {
     path: 'manager',
     children: [
-      { path: '', redirectTo: 'login', pathMatch: 'full' },
-      {
-        path: 'login',
-        loadComponent: () => import('./manager/manager-login.component').then(m => m.ManagerLoginComponent)
-      },
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       {
         path: '',
         loadComponent: () => import('./manager/manager-shell/manager-shell.component').then(m => m.ManagerShellComponent),
@@ -94,7 +90,7 @@ export const routes: Routes = [
           {
             path: 'notices',
             loadComponent: () => import('./components/notices/notices-board.component').then(m => m.NoticesBoardComponent),
-            data: { postedBy: 'Hostel Manager' }
+            data: { postedBy: 'Mess Manager' }
           },
           {
             path: 'bills',
@@ -133,5 +129,25 @@ export const routes: Routes = [
       }
     ]
   },
-  { path: '**', redirectTo: 'admin/dashboard' }
+  {
+    path: 'super-admin',
+    children: [
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+      {
+        path: '',
+        loadComponent: () => import('./super-admin/super-admin-shell/super-admin-shell.component').then(m => m.SuperAdminShellComponent),
+        children: [
+          {
+            path: 'dashboard',
+            loadComponent: () => import('./super-admin/super-admin-dashboard/super-admin-dashboard.component').then(m => m.SuperAdminDashboardComponent)
+          },
+          {
+            path: 'hostels',
+            loadComponent: () => import('./super-admin/super-admin-hostels/super-admin-hostels.component').then(m => m.SuperAdminHostelsComponent)
+          }
+        ]
+      }
+    ]
+  },
+  { path: '**', redirectTo: 'login' }
 ];
