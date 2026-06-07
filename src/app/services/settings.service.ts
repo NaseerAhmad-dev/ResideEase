@@ -9,17 +9,17 @@ interface ApiResponse<T> { success: boolean; message: string; data: T; }
 
 const DEFAULT: AppSettings = {
   hostel: {
-    name: 'ResideEase Hostel',
-    address: '123 University Road, Campus Area, Pune - 411007',
-    phone: '+91 98765 43210',
-    email: 'admin@resideease.com',
-    website: 'https://resideease.com',
-    description: 'Modern hostel accommodation for students with 24/7 security, Wi-Fi, and quality mess facilities.',
-    totalRooms: 120,
-    establishedYear: 2018,
-    affiliation: 'Savitribai Phule Pune University',
-    wardenName: 'Dr. Ramesh Kulkarni',
-    wardenPhone: '+91 98765 43211',
+    name: '',
+    address: '',
+    phone: '',
+    email: '',
+    website: '',
+    description: '',
+    totalRooms: 0,
+    establishedYear: new Date().getFullYear(),
+    affiliation: '',
+    wardenName: '',
+    wardenPhone: '',
   },
   rooms: ROOM_OPTIONS.map(r => ({ id: r.id, label: r.label, price: r.price, securityDeposit: r.price * 2, enabled: true })),
   meals: MEAL_PLANS.map(m => ({ id: m.id, label: m.label, price: m.price, enabled: true })),
@@ -37,7 +37,7 @@ const DEFAULT: AppSettings = {
     academicYear: '2025-26', maintenanceCharge: 500,
   },
   guestFee: 200,
-  admin: { name: 'Office Admin', email: 'admin@resideease.com', phone: '+91 98765 43210', designation: 'Hostel Office' },
+  admin: { name: '', email: '', phone: '', designation: '' },
 };
 
 @Injectable({ providedIn: 'root' })

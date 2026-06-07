@@ -1,21 +1,18 @@
-import { Component, HostListener, ElementRef, signal, computed, inject } from '@angular/core';
+import { Component, HostListener, ElementRef, signal, inject, OnInit } from '@angular/core';
 import { Router, RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { ThemeService } from '../../services/theme.service';
+import { AuthService } from '../../services/auth.service';
+import { SettingsService } from '../../services/settings.service';
+import { NotificationService } from '../../services/notification.service';
+import { environment } from '../../../environments/environment';
 
 interface NavItem {
   label: string;
   route: string;
   icon: string;
   badge?: number;
-}
-
-interface AppNotification {
-  id: string;
-  title: string;
-  message: string;
-  time: string;
-  type: 'info' | 'success' | 'warning';
-  read: boolean;
 }
 
 @Component({
@@ -25,37 +22,76 @@ interface AppNotification {
   templateUrl: './admin-shell.component.html',
   styleUrl: './admin-shell.component.scss'
 })
-export class AdminShellComponent {
-  private readonly router = inject(Router);
-  private readonly elRef = inject(ElementRef);
+export class AdminShellComponent implements OnInit {
+  private readonly router              = inject(Router);
+  private readonly elRef               = inject(ElementRef);
+  private readonly http                = inject(HttpClient);
+  private readonly authService         = inject(AuthService);
+  private readonly settingsService     = inject(SettingsService);
+  readonly themeService                = inject(ThemeService);
+  readonly notificationService         = inject(NotificationService);
 
-  sidebarOpen = signal(true);
+  get userName():    string { return this.authService.getUser()?.name || 'Admin'; }
+  get userInitial(): string { return this.userName[0].toUpperCase(); }
+  get hostelName():  string { return this.settingsService.getSettings()().hostel.name || 'My Hostel'; }
+
+  readonly notifications = this.notificationService.notifications;
+  readonly unreadCount   = this.notificationService.unreadCount;
+
+  sidebarOpen       = signal(true);
   showNotifications = signal(false);
-  showProfileMenu = signal(false);
-
-  notifications: AppNotification[] = [
-    { id: '1', title: 'New student registered', message: 'Aanya Sharma completed onboarding for Room 204.', time: '5 min ago', type: 'info', read: false },
-    { id: '2', title: 'Payment received', message: '₹12,500 received from Rohan Mehta (Roll: CSE-221).', time: '1 hr ago', type: 'success', read: false },
-    { id: '3', title: 'Maintenance request', message: 'Room 112 reported a plumbing issue. Assign a technician.', time: '3 hr ago', type: 'warning', read: false },
-    { id: '4', title: 'Mess enrollment updated', message: '14 students switched to vegetarian plan for next month.', time: 'Yesterday', type: 'info', read: true },
-    { id: '5', title: 'Room checkout', message: 'Priya Nair (Room 301) has checked out successfully.', time: 'Yesterday', type: 'success', read: true },
-  ];
-
-  unreadCount = computed(() => this.notifications.filter(n => !n.read).length);
+  showProfileMenu   = signal(false);
 
   navItems: NavItem[] = [
-    { label: 'Overview',   route: '/admin/dashboard', icon: 'grid' },
-    { label: 'Students',   route: '/admin/students',  icon: 'users', badge: 3 },
-    { label: 'Rooms',      route: '/admin/rooms',     icon: 'door' },
-    { label: 'Mess',       route: '/admin/mess',      icon: 'fork' },
-    { label: 'Payments',   route: '/admin/payments',  icon: 'credit', badge: 5 },
-    { label: 'Notices',    route: '/admin/notices',   icon: 'bell' },
-    { label: 'Requests',   route: '/admin/requests',  icon: 'wrench' },
+    { label: 'Overview',   route: '/admin/dashboard', icon: 'grid'      },
+    { label: 'Students',   route: '/admin/students',  icon: 'users',    badge: 3 },
+    { label: 'Rooms',      route: '/admin/rooms',     icon: 'door'      },
+    { label: 'Employees',  route: '/admin/employees', icon: 'briefcase' },
+    { label: 'Mess',       route: '/admin/mess',      icon: 'fork'      },
+    { label: 'Payments',   route: '/admin/payments',  icon: 'credit',   badge: 5 },
+    { label: 'Notices',    route: '/admin/notices',   icon: 'bell'      },
+    { label: 'Requests',   route: '/admin/requests',  icon: 'wrench'    },
   ];
 
   bottomNav: NavItem[] = [
     { label: 'Settings', route: '/admin/settings', icon: 'gear' },
   ];
+
+  ngOnInit(): void {
+    this.notificationService.load();
+    this.loadBadgeCounts();
+  }
+
+  relativeTime(iso: string): string {
+    const diff = Date.now() - new Date(iso).getTime();
+    const m = Math.floor(diff / 60000);
+    if (m < 1)   return 'Just now';
+    if (m < 60)  return `${m} min ago`;
+    const h = Math.floor(m / 60);
+    if (h < 24)  return `${h} hr ago`;
+    const d = Math.floor(h / 24);
+    if (d === 1) return 'Yesterday';
+    return `${d} days ago`;
+  }
+
+  private loadBadgeCounts(): void {
+    const token = this.authService.getToken();
+    if (!token) return;
+    const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
+    this.http.get<any>(`${environment.apiUrl}/dashboard/counts`, { headers }).subscribe({
+      next: res => {
+        if (!res.success) return;
+        this.navItems = this.navItems.map(n => {
+          if (n.route === '/admin/students')
+            return { ...n, badge: res.data.pendingStudents || undefined };
+          if (n.route === '/admin/payments')
+            return { ...n, badge: res.data.overduePayments || undefined };
+          return n;
+        });
+      },
+      error: () => {},
+    });
+  }
 
   toggleSidebar(): void { this.sidebarOpen.update(v => !v); }
 
@@ -71,9 +107,9 @@ export class AdminShellComponent {
     this.showProfileMenu.update(v => !v);
   }
 
-  markAllRead(): void {
-    this.notifications = this.notifications.map(n => ({ ...n, read: true }));
-  }
+  markAllRead(): void { this.notificationService.markAllRead(); }
+
+  markRead(id: string): void { this.notificationService.markRead(id); }
 
   goToSettings(): void {
     this.showProfileMenu.set(false);

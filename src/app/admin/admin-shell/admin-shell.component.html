@@ -50,6 +50,9 @@
               @case ('gear') {
                 <svg width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M10 13a3 3 0 100-6 3 3 0 000 6z" stroke="currentColor" stroke-width="1.5"/><path d="M17.7 10.9l-1.4-.8a6 6 0 000-2.2l1.4-.8a1 1 0 00.4-1.3l-1-1.7a1 1 0 00-1.3-.4l-1.4.8a6 6 0 00-1.9-1.1V1.7A1 1 0 0011.5 1h-3a1 1 0 00-1 1v1.4A6 6 0 005.6 4.5l-1.4-.8a1 1 0 00-1.3.4l-1 1.7a1 1 0 00.4 1.3l1.4.8a6 6 0 000 2.2l-1.4.8a1 1 0 00-.4 1.3l1 1.7a1 1 0 001.3.4l1.4-.8a6 6 0 001.9 1.1v1.4a1 1 0 001 1h3a1 1 0 001-1v-1.4a6 6 0 001.9-1.1l1.4.8a1 1 0 001.3-.4l1-1.7a1 1 0 00-.4-1.3z" stroke="currentColor" stroke-width="1.3"/></svg>
               }
+              @case ('briefcase') {
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2M12 12v.01M8 12h8"/></svg>
+              }
               @case ('wrench') {
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
               }
@@ -87,16 +90,16 @@
       <!-- User avatar -->
       @if (sidebarOpen()) {
         <div class="nav-user">
-          <div class="user-avatar">O</div>
+          <div class="user-avatar">{{ userInitial }}</div>
           <div class="user-info">
-            <div class="user-name">Office Admin</div>
-            <div class="user-role">Sunrise Engineering</div>
+            <div class="user-name">{{ userName }}</div>
+            <div class="user-role">{{ hostelName }}</div>
           </div>
         </div>
       }
       @if (!sidebarOpen()) {
         <div class="nav-user-mini">
-          <div class="user-avatar">O</div>
+          <div class="user-avatar">{{ userInitial }}</div>
         </div>
       }
 
@@ -149,6 +152,22 @@
 
       <div class="topbar-actions">
 
+        <!-- Theme toggle -->
+        <button class="icon-btn" (click)="themeService.toggle()" type="button"
+                [attr.aria-label]="themeService.isDark() ? 'Switch to light mode' : 'Switch to dark mode'"
+                title="Toggle theme">
+          @if (themeService.isDark()) {
+            <svg width="18" height="18" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+              <circle cx="10" cy="10" r="4" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M10 2v2M10 16v2M2 10h2M16 10h2M4.22 4.22l1.42 1.42M14.36 14.36l1.42 1.42M4.22 15.78l1.42-1.42M14.36 5.64l1.42-1.42" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          } @else {
+            <svg width="18" height="18" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+              <path d="M17.5 11.5A7.5 7.5 0 0 1 8.5 2.5a7.5 7.5 0 1 0 9 9z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          }
+        </button>
+
         <!-- Notification bell -->
         <div class="dropdown-wrap">
           <button class="icon-btn" (click)="toggleNotifications($event)" aria-label="Notifications" [attr.aria-expanded]="showNotifications()">
@@ -172,15 +191,19 @@
                 }
               </div>
               <div class="notif-list">
-                @for (n of notifications; track n.title) {
-                  <div class="notif-item" [class.notif-item--unread]="!n.read">
+                @for (n of notifications(); track n.id) {
+                  <div class="notif-item" [class.notif-item--unread]="!n.isRead"
+                       (click)="markRead(n.id)" style="cursor:pointer">
                     <span class="notif-indicator" [ngClass]="'notif-indicator--' + n.type"></span>
                     <div class="notif-body">
                       <p class="notif-title">{{ n.title }}</p>
                       <p class="notif-msg">{{ n.message }}</p>
-                      <span class="notif-time">{{ n.time }}</span>
+                      <span class="notif-time">{{ relativeTime(n.createdAt) }}</span>
                     </div>
                   </div>
+                }
+                @if (notifications().length === 0) {
+                  <div class="notif-empty">No notifications</div>
                 }
               </div>
             </div>
@@ -189,15 +212,15 @@
 
         <!-- Profile avatar -->
         <div class="dropdown-wrap">
-          <button class="topbar-avatar" (click)="toggleProfileMenu($event)" aria-label="Admin profile menu" [attr.aria-expanded]="showProfileMenu()" type="button">O</button>
+          <button class="topbar-avatar" (click)="toggleProfileMenu($event)" aria-label="Admin profile menu" [attr.aria-expanded]="showProfileMenu()" type="button">{{ userInitial }}</button>
 
           @if (showProfileMenu()) {
             <div class="profile-menu" role="menu">
               <div class="profile-menu-header">
-                <div class="profile-menu-avatar">O</div>
+                <div class="profile-menu-avatar">{{ userInitial }}</div>
                 <div>
-                  <p class="profile-menu-name">Office Admin</p>
-                  <p class="profile-menu-role">Hostel Office</p>
+                  <p class="profile-menu-name">{{ userName }}</p>
+                  <p class="profile-menu-role">{{ hostelName }}</p>
                 </div>
               </div>
               <hr class="profile-menu-divider">

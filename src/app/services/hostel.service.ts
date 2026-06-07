@@ -38,6 +38,65 @@ export interface HostelSettings {
   timezone:         string;
 }
 
+export interface HostelStaffUser {
+  id:       string;
+  name:     string | null;
+  email:    string | null;
+  username: string | null;
+  role:     { name: string };
+}
+
+export interface HostelSubscription {
+  id:           string;
+  planName:     string;
+  planId:       string | null;
+  status:       string;
+  billingCycle: string | null;
+  seatLimit:    number | null;
+  staffLimit:   number | null;
+  startsAt:     string;
+  endsAt:       string | null;
+  trialEndsAt:  string | null;
+  graceEndsAt:  string | null;
+  isCurrent:    boolean;
+}
+
+export interface HostelPayment {
+  id:             string;
+  hostelId:       string;
+  subscriptionId: string | null;
+  amount:         number;
+  currency:       string;
+  status:         string;
+  paymentMethod:  string | null;
+  paidAt:         string | null;
+  invoiceUrl:     string | null;
+  createdAt:      string;
+}
+
+export interface UpsertSubscriptionPayload {
+  planName:     string;
+  planId?:      string | null;
+  status?:      string;
+  billingCycle?: string | null;
+  seatLimit?:   number | null;
+  staffLimit?:  number | null;
+  startsAt?:    string;
+  endsAt?:      string | null;
+  trialEndsAt?: string | null;
+  graceEndsAt?: string | null;
+}
+
+export interface RecordPaymentPayload {
+  amount:         number;
+  currency?:      string;
+  paymentMethod?: string | null;
+  status?:        string;
+  paidAt?:        string | null;
+  invoiceUrl?:    string | null;
+  subscriptionId?: string | null;
+}
+
 export interface Hostel {
   id:         string;
   name:       string;
@@ -49,9 +108,11 @@ export interface Hostel {
   createdAt:  string;
   updatedAt:  string;
   deletedAt:  string | null;
-  location:   HostelLocation | null;
-  owners:     HostelOwner[];
-  settings:   HostelSettings | null;
+  location:      HostelLocation | null;
+  owners:        HostelOwner[];
+  settings:      HostelSettings | null;
+  subscriptions: HostelSubscription[];
+  users:         HostelStaffUser[];
 }
 
 export interface CreateHostelPayload {
@@ -120,6 +181,10 @@ export class HostelService {
     return this.http.get<ApiResponse<Hostel[]>>(`${environment.apiUrl}/hostels`, { headers: this.headers });
   }
 
+  getHostel(id: string): Observable<ApiResponse<Hostel>> {
+    return this.http.get<ApiResponse<Hostel>>(`${environment.apiUrl}/hostels/${id}`, { headers: this.headers });
+  }
+
   createHostel(payload: CreateHostelPayload): Observable<ApiResponse<Hostel>> {
     return this.http.post<ApiResponse<Hostel>>(`${environment.apiUrl}/hostels`, payload, { headers: this.headers });
   }
@@ -130,5 +195,17 @@ export class HostelService {
 
   deleteHostel(id: string): Observable<ApiResponse<null>> {
     return this.http.delete<ApiResponse<null>>(`${environment.apiUrl}/hostels/${id}`, { headers: this.headers });
+  }
+
+  upsertSubscription(hostelId: string, payload: UpsertSubscriptionPayload): Observable<ApiResponse<HostelSubscription>> {
+    return this.http.put<ApiResponse<HostelSubscription>>(`${environment.apiUrl}/hostels/${hostelId}/subscription`, payload, { headers: this.headers });
+  }
+
+  listPayments(hostelId: string): Observable<ApiResponse<HostelPayment[]>> {
+    return this.http.get<ApiResponse<HostelPayment[]>>(`${environment.apiUrl}/hostels/${hostelId}/payments`, { headers: this.headers });
+  }
+
+  recordPayment(hostelId: string, payload: RecordPaymentPayload): Observable<ApiResponse<HostelPayment>> {
+    return this.http.post<ApiResponse<HostelPayment>>(`${environment.apiUrl}/hostels/${hostelId}/payments`, payload, { headers: this.headers });
   }
 }

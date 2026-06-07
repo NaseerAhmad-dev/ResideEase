@@ -47,6 +47,37 @@
   --shadow-lg:      0 0.8rem 2.4rem rgba(0,0,0,0.10), 0 0.4rem 0.8rem rgba(0,0,0,0.04);
   --shadow-brand:   0 0.4rem 1.6rem rgba(10,180,168,0.25);
   --sidebar-width:  24rem;
+  /* aliases used in component stylesheets */
+  --bg-primary:     var(--bg-card);
+  --bg-secondary:   #f8f7f4;
+}
+
+[data-theme="dark"] {
+  --bg-page:        #0f1117;
+  --bg-card:        #1a1d27;
+  --bg-input:       #252836;
+  --bg-hover:       #1e2735;
+  --bg-primary:     #1a1d27;
+  --bg-secondary:   #252836;
+  --text-primary:   #f0f0f0;
+  --text-secondary: #9aa3b2;
+  --text-muted:     #6b7685;
+  --text-on-brand:  #ffffff;
+  --border-light:   #2a2d3a;
+  --border-medium:  #363948;
+  --border-focus:   #0ab4a8;
+  --shadow-sm:      0 0.1rem 0.3rem rgba(0,0,0,0.25), 0 0.1rem 0.2rem rgba(0,0,0,0.15);
+  --shadow-md:      0 0.4rem 1.2rem rgba(0,0,0,0.35), 0 0.2rem 0.4rem rgba(0,0,0,0.20);
+  --shadow-lg:      0 0.8rem 2.4rem rgba(0,0,0,0.40), 0 0.4rem 0.8rem rgba(0,0,0,0.20);
+  --shadow-brand:   0 0.4rem 1.6rem rgba(10,180,168,0.30);
+  --c-success-bg:   #052e1c;
+  --c-warning-bg:   #2d1f00;
+  --c-danger-bg:    #2d0f0f;
+  --c-info-bg:      #0c1a35;
+  --brand-light:    #0c2927;
+  --brand-mid:      #134e4a;
+  --accent-light:   #2d1500;
+  --accent-mid:     #7c2d12;
 }
 
 html {

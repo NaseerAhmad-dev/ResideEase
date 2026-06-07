@@ -36,6 +36,10 @@ export const routes: Routes = [
         loadComponent: () => import('./admin/rooms/rooms.component').then(m => m.RoomsComponent)
       },
       {
+        path: 'employees',
+        loadComponent: () => import('./admin/employees/employees.component').then(m => m.EmployeesComponent)
+      },
+      {
         path: 'mess',
         loadComponent: () => import('./admin/mess/mess.component').then(m => m.MessComponent)
       },
@@ -144,6 +148,10 @@ export const routes: Routes = [
           {
             path: 'hostels',
             loadComponent: () => import('./super-admin/super-admin-hostels/super-admin-hostels.component').then(m => m.SuperAdminHostelsComponent)
+          },
+          {
+            path: 'hostels/:id',
+            loadComponent: () => import('./super-admin/super-admin-hostel-detail/super-admin-hostel-detail.component').then(m => m.SuperAdminHostelDetailComponent)
           }
         ]
       }

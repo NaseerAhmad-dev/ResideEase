@@ -68,7 +68,7 @@
     </ng-template>
 
     <ng-template pTemplate="body" let-h>
-      <tr>
+      <tr class="clickable-row" (click)="viewHostel(h)">
         <td>
           <div class="hostel-cell">
             <div class="h-avatar">{{ initials(h.name) }}</div>
@@ -95,7 +95,7 @@
           <p-tag [value]="h.isActive ? 'Active' : 'Inactive'" [severity]="severity(h.isActive)"/>
         </td>
         <td class="text-sm text-muted">{{ formatDate(h.createdAt) }}</td>
-        <td class="actions-cell">
+        <td class="actions-cell" (click)="$event.stopPropagation()">
           <button type="button" class="action-btn edit-btn" title="Edit" (click)="openEdit(h)">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>
           </button>
@@ -150,14 +150,10 @@
         <input id="h-name" type="text" formControlName="name" placeholder="e.g. Green Valley Boys Hostel"/>
       </div>
 
-      <div class="field-group">
-        <label for="h-type">Hostel Type</label>
-        <select id="h-type" formControlName="hostelType">
-          @for (opt of hostelTypeOptions; track opt.value) {
-            <option [value]="opt.value">{{ opt.label }}</option>
-          }
-        </select>
-      </div>
+      <app-dropdown label="Hostel Type"
+                    formControlName="hostelType"
+                    [options]="hostelTypeOptions">
+      </app-dropdown>
 
       <!-- Location -->
       <div class="section-divider"><span>Location</span></div>
@@ -215,15 +211,11 @@
           </label>
         </div>
         @if (hostelForm.get('hasMess')?.value) {
-          <div class="field-group">
-            <label for="h-mess-type">Mess Type</label>
-            <select id="h-mess-type" formControlName="messType">
-              <option value="">Select…</option>
-              <option value="veg">Veg</option>
-              <option value="non-veg">Non-Veg</option>
-              <option value="both">Both</option>
-            </select>
-          </div>
+          <app-dropdown label="Mess Type"
+                        formControlName="messType"
+                        placeholder="Select…"
+                        [options]="messTypeOptions">
+          </app-dropdown>
         }
       </div>
 

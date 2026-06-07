@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { MessService } from '../../services/mess.service';
 import { MessNotification } from '../../models/mess.model';
 import { AuthService } from '../../services/auth.service';
+import { ThemeService } from '../../services/theme.service';
 import { Subscription } from 'rxjs';
 
 interface NavItem {
@@ -24,6 +25,7 @@ export class ManagerShellComponent implements OnInit, OnDestroy {
   private readonly router = inject(Router);
   private readonly messService = inject(MessService);
   private readonly authService = inject(AuthService);
+  readonly themeService = inject(ThemeService);
 
   sidebarOpen = signal(true);
   notifOpen   = signal(false);

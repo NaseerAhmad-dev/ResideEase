@@ -2,6 +2,7 @@ import { Component, signal, HostListener, inject, OnInit } from '@angular/core';
 import { Router, RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../services/auth.service';
+import { ThemeService } from '../../services/theme.service';
 
 interface NavItem {
   label: string;
@@ -19,6 +20,7 @@ interface NavItem {
 export class SuperAdminShellComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly authService = inject(AuthService);
+  readonly themeService = inject(ThemeService);
 
   sidebarOpen = signal(true);
   notifOpen   = signal(false);

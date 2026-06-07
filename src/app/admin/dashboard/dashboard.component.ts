@@ -1,53 +1,116 @@
-import { Component } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { DashboardService } from '../../services/dashboard.service';
+
+interface KpiCard  { label: string; value: string; sub: string; color: string; }
+interface PersonRow { id: string; name: string; room: string; avatar: string; }
+interface StudentRow { id: string; name: string; room: string; plan: string; status: string; avatar: string; }
+interface RoomOccRow { type: string; label: string; total: number; totalCapacity: number; occupied: number; pct: number; }
+interface MessRow   { meal: string; count: number; total: number; pct: number; time: string; }
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
   imports: [CommonModule, RouterLink],
   templateUrl: './dashboard.component.html',
-  styleUrl: './dashboard.component.scss'
+  styleUrl: './dashboard.component.scss',
 })
-export class DashboardComponent {
-  today = new Date();
+export class DashboardComponent implements OnInit {
+  private readonly dashboardService = inject(DashboardService);
 
-  kpis = [
-    { label: 'Total beds',     value: '500',   sub: 'Total capacity',          color: 'brand'   },
-    { label: 'Occupied',       value: '435',   sub: '87% occupancy rate',      color: 'green'   },
-    { label: 'Vacant',         value: '65',    sub: '13% available now',       color: 'amber'   },
-    { label: 'Pending dues',   value: '₹68K',  sub: '11 students overdue',     color: 'danger'  },
-  ];
+  today     = new Date();
+  isLoading = true;
+  hasError  = false;
 
-  checkOuts = [
-    { name: 'Rahul Mehta',    room: 'B-204', time: '10:00 AM', avatar: 'RM' },
-    { name: 'Priya Nair',     room: 'C-318', time: '11:30 AM', avatar: 'PN' },
-    { name: 'Aman Verma',     room: 'A-112', time: '12:00 PM', avatar: 'AV' },
-  ];
+  kpis:           KpiCard[]    = [];
+  checkOuts:      PersonRow[]  = [];
+  checkIns:       PersonRow[]  = [];
+  recentStudents: StudentRow[] = [];
+  roomOccupancy:  RoomOccRow[] = [];
+  messStats:      MessRow[]    = [];
 
-  checkIns = [
-    { name: 'Karan Shah',     room: 'B-207', time: '02:00 PM', avatar: 'KS' },
-    { name: 'Sneha Rajan',    room: 'D-401', time: '03:30 PM', avatar: 'SR' },
-  ];
+  quickStats = {
+    totalResidents: 0, newThisMonth: 0,
+    totalRevenue: 0, messAttendancePct: 0,
+    openMaintenance: 0, urgentMaintenance: 0,
+  };
+  overallOccupancyPct = 0;
+  upcomingThisWeek    = 0;
 
-  recentStudents = [
-    { name: 'Karan Shah',   room: 'B-207', plan: 'Full Board',  status: 'active',  date: 'Apr 17', avatar: 'KS' },
-    { name: 'Meera Pillai', room: 'C-302', plan: 'Half Board',  status: 'active',  date: 'Apr 16', avatar: 'MP' },
-    { name: 'Dev Anand',    room: 'A-108', plan: 'No Mess',     status: 'pending', date: 'Apr 15', avatar: 'DA' },
-    { name: 'Riya Joshi',   room: 'D-405', plan: 'Full Board',  status: 'active',  date: 'Apr 14', avatar: 'RJ' },
-    { name: 'Sohail Khan',  room: 'B-210', plan: 'Breakfast',   status: 'overdue', date: 'Apr 13', avatar: 'SK' },
-  ];
+  private readonly ROOM_LABELS: Record<string, string> = {
+    single: 'Single rooms',
+    double: 'Double sharing',
+    triple: 'Triple sharing',
+    suite:  'Suite rooms',
+  };
 
-  roomOccupancy = [
-    { type: 'Single rooms',  occupied: 47, total: 50,  pct: 94 },
-    { type: 'Double sharing', occupied: 176, total: 200, pct: 88 },
-    { type: 'Triple sharing', occupied: 171, total: 225, pct: 76 },
-    { type: 'Suite rooms',   occupied: 25,  total: 25,  pct: 100 },
-  ];
+  private readonly PLAN_LABELS: Record<string, string> = {
+    lunch:             'Lunch',
+    dinner:            'Dinner',
+    both:              'Full Mess',
+    'no-mess':         'No Mess',
+    'full-board':      'Full Board',
+    'half-board':      'Half Board',
+    'breakfast-only':  'Breakfast Only',
+  };
 
-  messStats = [
-    { meal: 'Breakfast', count: 312, total: 435, pct: 72, time: '7–9 AM' },
-    { meal: 'Lunch',     count: 287, total: 435, pct: 66, time: '12–2 PM' },
-    { meal: 'Dinner',    count: 0,   total: 435, pct: 0,  time: '7–9 PM' },
-  ];
+  ngOnInit(): void { this.loadStats(); }
+
+  reload(): void { this.loadStats(); }
+
+  private loadStats(): void {
+    this.isLoading = true;
+    this.hasError  = false;
+
+    this.dashboardService.getStats().subscribe({
+      next: s => {
+        const totalBeds = s.kpis.totalBeds;
+        const occupied  = s.kpis.occupied;
+        const occPct    = totalBeds > 0 ? Math.round((occupied / totalBeds) * 100) : 0;
+        const vacPct    = 100 - occPct;
+
+        this.kpis = [
+          { label: 'Total beds',    value: totalBeds.toLocaleString(), sub: 'Total capacity',                         color: 'brand'  },
+          { label: 'Occupied',      value: occupied.toLocaleString(),  sub: `${occPct}% occupancy rate`,              color: 'green'  },
+          { label: 'Vacant',        value: s.kpis.vacant.toLocaleString(), sub: `${vacPct}% available now`,          color: 'amber'  },
+          { label: 'Pending dues',  value: this.fmtMoney(s.kpis.pendingDuesAmount), sub: `${s.kpis.pendingDuesCount} students overdue`, color: 'danger' },
+        ];
+
+        this.quickStats          = s.quickStats;
+        this.overallOccupancyPct = s.overallOccupancyPct;
+        this.upcomingThisWeek    = s.upcomingThisWeek;
+        this.checkOuts           = s.todayCheckOuts;
+        this.checkIns            = s.todayCheckIns;
+
+        this.recentStudents = s.recentStudents.map(r => ({
+          ...r, plan: this.PLAN_LABELS[r.plan] ?? r.plan,
+        }));
+
+        this.roomOccupancy = s.roomOccupancy.map(r => ({
+          ...r, label: this.ROOM_LABELS[r.type] ?? r.type,
+        }));
+
+        const total    = s.messToday.totalStudents;
+        const lunchPct  = total > 0 ? Math.round((s.messToday.lunch  / total) * 100) : 0;
+        const dinnerPct = total > 0 ? Math.round((s.messToday.dinner / total) * 100) : 0;
+        this.messStats = [
+          { meal: 'Lunch',  count: s.messToday.lunch,  total, pct: lunchPct,  time: '12–2 PM' },
+          { meal: 'Dinner', count: s.messToday.dinner, total, pct: dinnerPct, time: '7–9 PM'  },
+        ];
+
+        this.isLoading = false;
+      },
+      error: () => {
+        this.isLoading = false;
+        this.hasError  = true;
+      },
+    });
+  }
+
+  fmtMoney(amount: number): string {
+    if (amount >= 100000) return `₹${(amount / 100000).toFixed(1)}L`;
+    if (amount >= 1000)   return `₹${Math.round(amount / 1000)}K`;
+    return `₹${amount}`;
+  }
 }

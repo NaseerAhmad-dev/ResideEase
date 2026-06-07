@@ -1,5 +1,62 @@
 .page { display: flex; flex-direction: column; gap: 20px; }
 
+/* ─── Loading / Error ─────────────────── */
+.dashboard-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 80px 0;
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.loading-spinner {
+  width: 20px; height: 20px;
+  border: 2px solid var(--border-light);
+  border-top-color: var(--brand);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.dashboard-error {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 20px;
+  background: var(--c-danger-bg);
+  border: 1px solid #fca5a5;
+  border-radius: var(--radius-md);
+  color: var(--c-danger);
+  font-size: 14px;
+}
+
+.btn-retry {
+  margin-left: auto;
+  padding: 6px 14px;
+  background: var(--c-danger);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  transition: opacity 0.15s;
+  &:hover { opacity: 0.88; }
+}
+
+/* ─── Empty / no-data ─────────────────── */
+.list-empty {
+  padding: 20px 0;
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
 /* ─── Page header ─────────────────────── */
 .page-header {
   display: flex;

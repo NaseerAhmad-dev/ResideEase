@@ -247,6 +247,22 @@
   margin-left: auto;
 }
 
+.icon-btn {
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, color 0.15s;
+
+  &:hover { background: var(--bg-page); color: var(--text-primary); }
+}
+
 .topbar-avatar {
   width: 34px;
   height: 34px;

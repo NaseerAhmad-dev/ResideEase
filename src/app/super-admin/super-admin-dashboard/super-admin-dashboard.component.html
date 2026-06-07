@@ -70,7 +70,7 @@
             <div class="hostel-avatar">{{ initials(h.name) }}</div>
             <div class="hostel-info">
               <div class="hostel-name">{{ h.name }}</div>
-              <div class="hostel-meta">{{ h.location?.city ?? '' }}{{ h.location?.city && h.owners[0]?.email ? ' · ' : '' }}{{ h.owners[0]?.email ?? '' }}</div>
+              <div class="hostel-meta">{{ h.location?.city ?? '' }}{{ h.location?.city && h.owners.at(0)?.email ? ' · ' : '' }}{{ h.owners.at(0)?.email ?? '' }}</div>
             </div>
             <span class="status-badge" [class.status-badge--inactive]="!h.isActive">
               {{ h.isActive ? 'Active' : 'Inactive' }}

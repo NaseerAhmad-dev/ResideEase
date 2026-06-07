@@ -1,24 +1,27 @@
 import { Component, OnInit, inject, signal, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 import { TableModule, Table } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { DropdownModule } from 'primeng/dropdown';
 import { InputTextModule } from 'primeng/inputtext';
 import { HostelService, Hostel } from '../../services/hostel.service';
+import { DropdownComponent } from '../../components/resuable/dropdown/dropdown.component';
 
 type PanelMode = 'create' | 'edit';
 
 @Component({
   selector: 'app-super-admin-hostels',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, TableModule, TagModule, DropdownModule, InputTextModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, TableModule, TagModule, DropdownModule, InputTextModule, DropdownComponent],
   templateUrl: './super-admin-hostels.component.html',
   styleUrl: './super-admin-hostels.component.scss'
 })
 export class SuperAdminHostelsComponent implements OnInit {
   private readonly hostelService = inject(HostelService);
   private readonly fb            = inject(FormBuilder);
+  private readonly router        = inject(Router);
 
   @ViewChild('dt') dt!: Table;
 
@@ -39,6 +42,12 @@ export class SuperAdminHostelsComponent implements OnInit {
     { label: 'Mixed',  value: 'mixed'  },
     { label: 'Boys',   value: 'boys'   },
     { label: 'Girls',  value: 'girls'  },
+  ];
+
+  messTypeOptions = [
+    { label: 'Veg',     value: 'veg'     },
+    { label: 'Non-Veg', value: 'non-veg' },
+    { label: 'Both',    value: 'both'    },
   ];
 
   panelOpen = signal(false);
@@ -222,6 +231,10 @@ export class SuperAdminHostelsComponent implements OnInit {
       next:  () => { this.deleting = false; this.cancelDelete(); this.load(); },
       error: err => { this.deleting = false; alert(err.error?.message ?? 'Failed to delete.'); }
     });
+  }
+
+  viewHostel(h: Hostel): void {
+    this.router.navigate(['/super-admin/hostels', h.id]);
   }
 
   primaryOwner(h: Hostel): string {
