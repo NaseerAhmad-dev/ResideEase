@@ -45,7 +45,23 @@ export class HomeComponent {
         else if (role === 'manager')                   this.router.navigate(['/manager/dashboard']);
         else { this.authService.clearSession(); this.tryStudentLogin(identifier!, secret!); }
       },
-      error: () => this.tryStudentLogin(identifier!, secret!),
+      error: () => this.tryEmployeeLogin(identifier!, secret!),
+    });
+  }
+
+  private tryEmployeeLogin(email: string, password: string): void {
+    this.authService.loginEmployee(email, password).subscribe({
+      next: res => {
+        this.loading = false;
+        const role = res.data?.user?.role;
+        if (role === 'mess_manager' || role === 'warden' || role === 'accountant') {
+          this.router.navigate(['/manager/dashboard']);
+        } else {
+          this.authService.clearSession();
+          this.tryStudentLogin(email, password);
+        }
+      },
+      error: () => this.tryStudentLogin(email, password),
     });
   }
 

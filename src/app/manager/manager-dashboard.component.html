@@ -28,19 +28,19 @@
       </div>
       <div class="overview-cards">
         <article class="overview-card">
-          <p class="overview-card-label">New maintenance tickets</p>
-          <h3>4</h3>
-          <p class="overview-card-note">2 high priority · 2 low priority</p>
+          <p class="overview-card-label">Open maintenance tickets</p>
+          <h3>{{ dashboardStats ? dashboardStats.quickStats.openMaintenance : '—' }}</h3>
+          <p class="overview-card-note">{{ maintenanceNote || 'No open tickets' }}</p>
         </article>
         <article class="overview-card">
-          <p class="overview-card-label">Resident check-ins</p>
-          <h3>8</h3>
+          <p class="overview-card-label">Resident check-ins today</p>
+          <h3>{{ dashboardStats ? dashboardStats.todayCheckIns.length : '—' }}</h3>
           <p class="overview-card-note">Today's scheduled arrivals</p>
         </article>
         <article class="overview-card">
-          <p class="overview-card-label">Upcoming inspections</p>
-          <h3>3</h3>
-          <p class="overview-card-note">Rooms due for review</p>
+          <p class="overview-card-label">Upcoming check-ins</p>
+          <h3>{{ dashboardStats ? dashboardStats.upcomingThisWeek : '—' }}</h3>
+          <p class="overview-card-note">Arrivals in the next 7 days</p>
         </article>
       </div>
     </section>

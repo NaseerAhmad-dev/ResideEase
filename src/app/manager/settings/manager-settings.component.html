@@ -44,16 +44,13 @@
               <h2>Account information</h2>
             </div>
             <button class="btn-save" (click)="saveProfile()" [disabled]="saveStatus === 'saving'" type="button">
-              @if (saveStatus === 'saving') {
-                Saving…
-              }
+              @if (saveStatus === 'saving') { Saving… }
               @if (saveStatus === 'success') {
                 <svg width="14" height="14" viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"/><path d="M6.5 10l2.5 2.5 4.5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 Saved
               }
-              @if (saveStatus === 'idle') {
-                Save changes
-              }
+              @if (saveStatus === 'error') { Failed }
+              @if (saveStatus === 'idle') { Save changes }
             </button>
           </div>
 
@@ -61,7 +58,7 @@
             <div class="settings-avatar">{{ getInitials(profile.name) }}</div>
             <div>
               <div class="avatar-name">{{ profile.name }}</div>
-              <div class="avatar-meta">Mess Manager &nbsp;·&nbsp; {{ profile.hostel }}</div>
+              <div class="avatar-meta">{{ userRole }} &nbsp;·&nbsp; {{ profile.hostel }}</div>
             </div>
           </div>
 
@@ -84,7 +81,7 @@
             </div>
             <div class="form-group form-group--full">
               <label class="form-label">Role</label>
-              <div class="role-badge">Mess Manager</div>
+              <div class="role-badge">{{ userRole }}</div>
               <p class="form-hint">Role is assigned by the admin and cannot be changed here.</p>
             </div>
           </div>
@@ -106,15 +103,42 @@
             <form class="security-form" (ngSubmit)="changePassword()">
               <div class="form-group">
                 <label class="form-label" for="cur-pass">Current password</label>
-                <input id="cur-pass" type="password" class="form-input" [(ngModel)]="passwordForm.current" name="cur-pass" placeholder="Enter current password" autocomplete="current-password">
+                <div class="input-wrap">
+                  <input id="cur-pass" [type]="showCurrent ? 'text' : 'password'" class="form-input" [(ngModel)]="passwordForm.current" name="cur-pass" placeholder="Enter current password" autocomplete="current-password">
+                  <button type="button" class="eye-btn" (click)="showCurrent = !showCurrent" [attr.aria-label]="showCurrent ? 'Hide password' : 'Show password'">
+                    @if (showCurrent) {
+                      <svg width="16" height="16" viewBox="0 0 20 20" fill="none"><path d="M1 10s3.6-7 9-7 9 7 9 7-3.6 7-9 7-9-7-9-7z" stroke="currentColor" stroke-width="1.5"/><circle cx="10" cy="10" r="2.5" stroke="currentColor" stroke-width="1.5"/><path d="M3 3l14 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                    } @else {
+                      <svg width="16" height="16" viewBox="0 0 20 20" fill="none"><path d="M1 10s3.6-7 9-7 9 7 9 7-3.6 7-9 7-9-7-9-7z" stroke="currentColor" stroke-width="1.5"/><circle cx="10" cy="10" r="2.5" stroke="currentColor" stroke-width="1.5"/></svg>
+                    }
+                  </button>
+                </div>
               </div>
               <div class="form-group">
                 <label class="form-label" for="new-pass">New password</label>
-                <input id="new-pass" type="password" class="form-input" [(ngModel)]="passwordForm.newPass" name="new-pass" placeholder="At least 8 characters" autocomplete="new-password">
+                <div class="input-wrap">
+                  <input id="new-pass" [type]="showNew ? 'text' : 'password'" class="form-input" [(ngModel)]="passwordForm.newPass" name="new-pass" placeholder="At least 8 characters" autocomplete="new-password">
+                  <button type="button" class="eye-btn" (click)="showNew = !showNew" [attr.aria-label]="showNew ? 'Hide password' : 'Show password'">
+                    @if (showNew) {
+                      <svg width="16" height="16" viewBox="0 0 20 20" fill="none"><path d="M1 10s3.6-7 9-7 9 7 9 7-3.6 7-9 7-9-7-9-7z" stroke="currentColor" stroke-width="1.5"/><circle cx="10" cy="10" r="2.5" stroke="currentColor" stroke-width="1.5"/><path d="M3 3l14 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                    } @else {
+                      <svg width="16" height="16" viewBox="0 0 20 20" fill="none"><path d="M1 10s3.6-7 9-7 9 7 9 7-3.6 7-9 7-9-7-9-7z" stroke="currentColor" stroke-width="1.5"/><circle cx="10" cy="10" r="2.5" stroke="currentColor" stroke-width="1.5"/></svg>
+                    }
+                  </button>
+                </div>
               </div>
               <div class="form-group">
                 <label class="form-label" for="conf-pass">Confirm new password</label>
-                <input id="conf-pass" type="password" class="form-input" [(ngModel)]="passwordForm.confirm" name="conf-pass" placeholder="Repeat new password" autocomplete="new-password">
+                <div class="input-wrap">
+                  <input id="conf-pass" [type]="showConfirm ? 'text' : 'password'" class="form-input" [(ngModel)]="passwordForm.confirm" name="conf-pass" placeholder="Repeat new password" autocomplete="new-password">
+                  <button type="button" class="eye-btn" (click)="showConfirm = !showConfirm" [attr.aria-label]="showConfirm ? 'Hide password' : 'Show password'">
+                    @if (showConfirm) {
+                      <svg width="16" height="16" viewBox="0 0 20 20" fill="none"><path d="M1 10s3.6-7 9-7 9 7 9 7-3.6 7-9 7-9-7-9-7z" stroke="currentColor" stroke-width="1.5"/><circle cx="10" cy="10" r="2.5" stroke="currentColor" stroke-width="1.5"/><path d="M3 3l14 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                    } @else {
+                      <svg width="16" height="16" viewBox="0 0 20 20" fill="none"><path d="M1 10s3.6-7 9-7 9 7 9 7-3.6 7-9 7-9-7-9-7z" stroke="currentColor" stroke-width="1.5"/><circle cx="10" cy="10" r="2.5" stroke="currentColor" stroke-width="1.5"/></svg>
+                    }
+                  </button>
+                </div>
               </div>
 
               @if (passwordError) {

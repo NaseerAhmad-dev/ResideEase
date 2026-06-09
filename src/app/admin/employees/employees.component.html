@@ -172,6 +172,22 @@
                     [options]="statusOptions">
       </app-dropdown>
 
+      <div class="section-divider"><span>Login Access</span></div>
+
+      <app-dropdown label="Role"
+                    formControlName="role"
+                    [options]="roleOptions">
+      </app-dropdown>
+
+      <div class="field-group">
+        <label>{{ panelMode() === 'create' ? 'Password' : 'New Password' }}</label>
+        <input type="password" formControlName="password" autocomplete="new-password"
+               [placeholder]="panelMode() === 'create' ? 'Set a login password' : 'Leave blank to keep existing'"/>
+        @if (panelMode() === 'create') {
+          <span class="field-hint">Required only if this employee needs to log in.</span>
+        }
+      </div>
+
       <div class="section-divider"><span>Contact</span></div>
 
       <div class="field-row">

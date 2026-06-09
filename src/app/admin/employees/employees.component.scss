@@ -221,6 +221,8 @@
 
 .req { color: #dc2626; }
 
+.field-hint { font-size: 11.5px; color: var(--text-muted); margin-top: -2px; }
+
 .error-msg {
   display: flex; align-items: center; gap: 7px;
   padding: 10px 14px; background: #fef2f2; border: 1px solid #fecaca;

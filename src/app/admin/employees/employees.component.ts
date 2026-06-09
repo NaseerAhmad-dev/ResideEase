@@ -44,6 +44,13 @@ export class EmployeesComponent implements OnInit {
     { label: 'On Leave', value: 'on_leave'  },
   ];
 
+  readonly roleOptions = [
+    { label: 'Staff (no login)',  value: 'staff'         },
+    { label: 'Mess Manager',      value: 'mess_manager'  },
+    { label: 'Warden',            value: 'warden'        },
+    { label: 'Accountant',        value: 'accountant'    },
+  ];
+
   readonly departmentOptions = [
     { label: 'Administration', value: 'Administration' },
     { label: 'Mess',           value: 'Mess'           },
@@ -69,6 +76,8 @@ export class EmployeesComponent implements OnInit {
     department: [''],
     salary:     [null as number | null],
     status:     ['active'],
+    role:       ['staff'],
+    password:   [''],
     address:    [''],
     notes:      [''],
   });
@@ -86,7 +95,7 @@ export class EmployeesComponent implements OnInit {
   openCreate(): void {
     this.errorMsg = '';
     this.editingId = null;
-    this.form.reset({ status: 'active' });
+    this.form.reset({ status: 'active', role: 'staff' });
     this.panelMode.set('create');
     this.panelOpen.set(true);
   }
@@ -103,6 +112,8 @@ export class EmployeesComponent implements OnInit {
       department: emp.department ?? '',
       salary:     emp.salary     ?? null,
       status:     emp.status,
+      role:       emp.role       || 'staff',
+      password:   '',
       address:    emp.address    ?? '',
       notes:      emp.notes      ?? '',
     });
@@ -118,7 +129,7 @@ export class EmployeesComponent implements OnInit {
     this.errorMsg = '';
 
     const v = this.form.value;
-    const payload = {
+    const payload: any = {
       name:       v.name!,
       jobTitle:   v.jobTitle!,
       joinDate:   v.joinDate!,
@@ -127,9 +138,11 @@ export class EmployeesComponent implements OnInit {
       department: v.department || null,
       salary:     v.salary     ?? null,
       status:     v.status     || 'active',
+      role:       v.role       || 'staff',
       address:    v.address    || null,
       notes:      v.notes      || null,
     };
+    if (v.password) payload.password = v.password;
 
     const call = this.panelMode() === 'create'
       ? this.employeeService.create(payload)

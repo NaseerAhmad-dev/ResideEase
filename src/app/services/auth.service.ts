@@ -17,6 +17,12 @@ export class AuthService {
     );
   }
 
+  loginEmployee(email: string, password: string): Observable<{ success: boolean; data: { token: string; user: any } }> {
+    return this.http.post<any>(`${API}/auth/employee/login`, { email, password }).pipe(
+      tap(res => { if (res.success) this.saveSession(res.data.token, res.data.user); })
+    );
+  }
+
   loginStudent(rollNumber: string, phone: string): Observable<{ success: boolean; data: { token: string; user: any } }> {
     return this.http.post<any>(`${API}/auth/student/login`, { rollNumber, phone }).pipe(
       tap(res => { if (res.success) this.saveSession(res.data.token, res.data.user); })

@@ -14,6 +14,8 @@ export interface Employee {
   salary:     number | null;
   joinDate:   string;
   status:     string;
+  role:       string;
+  hostelId:   string | null;
   address:    string | null;
   notes:      string | null;
   createdAt:  string;
@@ -29,6 +31,9 @@ export interface EmployeePayload {
   department?: string | null;
   salary?:    number | null;
   status?:    string;
+  role?:      string;
+  password?:  string | null;
+  hostelId?:  string | null;
   address?:   string | null;
   notes?:     string | null;
 }
